@@ -1,0 +1,708 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Entrenador ICIF</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Concepto: aula de práctica. Barra fija con seis estaciones; cada estación abre con una idea y sigue con algo que se puede tocar. Blanco y azules; el naranja marca lo que el encuestador hace o debe cuidar. Tema único claro, por pedido. */
+:root{
+  --bg:#FFFFFF; --surface:#F3F7FC; --surface-2:#E4EDF8; --line:#C9D8EE;
+  --ink:#1B2233; --muted:#55607A;
+  --navy:#121448; --blue:#0075D4; --blue-2:#0096DF; --sky:#7FA7D9;
+  --orange:#F28A1A; --orange-ink:#A84E00; --orange-soft:#FFF2E3;
+  --ok:#0B6E45; --ok-soft:#E4F4EC; --bad:#B3261E; --bad-soft:#FCEAE8;
+  --fd:"Space Grotesk","Segoe UI",system-ui,sans-serif; --fb:"Inter","Segoe UI",system-ui,sans-serif;
+  --r:10px; --gut:max(16px, env(safe-area-inset-left, 0px)); --gutr:max(16px, env(safe-area-inset-right, 0px));
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3,h4{font-family:var(--fd);color:var(--navy);margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:clamp(1.7rem,4vw,2.6rem)} h2{font-size:clamp(1.35rem,2.6vw,1.8rem)} h3{font-size:1.12rem} h4{font-size:1rem}
+p{margin:0} ul{margin:0;padding-left:1.15rem} li{margin:.25rem 0}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:var(--gut);padding-right:var(--gutr)}
+.eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blue)}
+.muted{color:var(--muted)} .small{font-size:.88rem} .num{font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:1rem} .stack-s{display:flex;flex-direction:column;gap:.5rem}
+.row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
+.grid{display:grid;gap:1rem} .g2{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:820px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}}
+.lead{font-size:1.08rem;max-width:68ch}
+/* Barra */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:1rem;padding-block:.55rem;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:.75rem;min-width:0}
+.brand img{height:26px;width:auto}
+.brand b{font-family:var(--fd);color:var(--navy);font-size:1.02rem;white-space:nowrap}
+nav.tabs{display:flex;gap:.15rem;overflow-x:auto;margin-left:auto;max-width:100%;scrollbar-width:thin}
+nav.tabs button{background:none;border:0;padding:.5rem .7rem;border-radius:8px;font-weight:600;font-size:.9rem;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs button:hover{background:var(--surface);color:var(--navy)}
+nav.tabs button[aria-current="page"]{color:var(--navy);border-bottom-color:var(--orange);border-radius:8px 8px 0 0}
+nav.tabs .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--line);margin-right:.4rem;vertical-align:middle}
+nav.tabs button.seen .dot{background:var(--orange)}
+main{padding-block:1.75rem 3.5rem}
+section.view{display:flex;flex-direction:column;gap:2rem}
+.band{background:var(--surface);border-radius:var(--r);padding:1.25rem}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:1.1rem;background:var(--bg);min-width:0}
+.dark{background:var(--navy);color:#fff;border-radius:var(--r);padding:1.25rem}
+.dark h3,.dark h4{color:#fff} .dark .eyebrow{color:var(--orange)}
+.tip{background:var(--orange-soft);border-left:4px solid var(--orange);padding:.7rem .9rem;border-radius:0 8px 8px 0;font-size:.94rem}
+.tip b{color:var(--orange-ink)}
+.btn{background:var(--orange);color:var(--navy);border:0;border-radius:8px;padding:.6rem 1rem;font-weight:700}
+.btn:hover{filter:brightness(.95)} .btn.ghost{background:var(--bg);border:1.5px solid var(--blue);color:var(--blue)}
+.pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.76rem;font-weight:700;padding:.18rem .6rem;border-radius:99px;background:var(--surface-2);color:var(--navy);white-space:nowrap}
+.pill.o{background:var(--orange-soft);color:var(--orange-ink)} .pill.b{background:var(--blue);color:#fff} .pill.n{background:var(--navy);color:#fff}
+/* Hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:2rem;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}}
+.phrase{font-family:var(--fd);font-weight:600;font-size:clamp(1.5rem,3.6vw,2.35rem);color:var(--navy);line-height:1.18}
+.phrase em{font-style:normal;color:var(--blue)} .phrase mark{background:none;color:var(--orange-ink);box-shadow:inset 0 -.32em 0 var(--orange-soft)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+.fact{background:var(--surface);border-radius:var(--r);padding:.8rem .9rem}
+.fact b{display:block;font-family:var(--fd);font-size:1.7rem;color:var(--blue);line-height:1.1}
+.fact span{font-size:.86rem;color:var(--muted)}
+/* Cadena */
+.toc{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr) minmax(0,210px);gap:1rem}
+@media (max-width:900px){.toc{grid-template-columns:minmax(0,1fr)}}
+.toc .side{display:flex;flex-direction:column;gap:.75rem}
+.toc .side .card{padding:.8rem;font-size:.9rem}
+.chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.chain button{border:0;color:#fff;font-family:var(--fd);font-weight:600;font-size:.98rem;padding:.85rem .4rem .85rem 1.1rem;text-align:center;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);min-height:58px}
+.chain button:first-child{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%)}
+.chain button[aria-pressed="true"]{box-shadow:inset 0 -6px 0 var(--orange)}
+.c0{background:var(--sky)} .c1{background:var(--blue-2)} .c2{background:var(--blue)} .c3{background:var(--navy)}
+.measure{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:6px;font-size:.82rem;font-weight:600;text-align:center}
+.measure div{background:var(--surface-2);color:var(--navy);padding:.45rem .3rem;border-radius:4px}
+.measure .icif{grid-column:span 2;background:var(--navy);color:#fff}
+@media (max-width:600px){.chain,.measure{grid-template-columns:repeat(2,minmax(0,1fr))}.chain button{clip-path:none!important;border-radius:6px;padding:.7rem .4rem}}
+.stagepanel{margin-top:.9rem;border:1px solid var(--line);border-top:4px solid var(--orange);border-radius:var(--r);padding:1rem}
+.kv{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:.35rem .9rem;font-size:.94rem}
+.kv dt{font-weight:700;color:var(--blue)} .kv dd{margin:0}
+@media (max-width:600px){.kv{grid-template-columns:minmax(0,1fr)}.kv dd{margin-bottom:.4rem}}
+/* Instrumento */
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chips button{border:1.5px solid var(--line);background:var(--bg);border-radius:99px;padding:.35rem .8rem;font-weight:600;font-size:.88rem;color:var(--navy)}
+.chips button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.q{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.q>summary{list-style:none;cursor:pointer;display:flex;gap:.8rem;align-items:flex-start;padding:.85rem 1rem}
+.q>summary::-webkit-details-marker{display:none}
+.q[open]>summary{background:var(--surface)}
+.qn{font-family:var(--fd);font-weight:700;color:var(--blue);min-width:2.6rem;font-size:1.05rem}
+.qt{flex:1;min-width:0;font-weight:600;color:var(--navy)}
+.qbody{padding:.2rem 1rem 1rem 1rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
+@media (max-width:720px){.qbody{grid-template-columns:minmax(0,1fr)}}
+.say{background:var(--surface);border-radius:8px;padding:.7rem .85rem;font-style:italic;color:var(--navy)}
+.opts{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.opt{font-size:.85rem;border:1px solid var(--line);border-radius:6px;padding:.2rem .5rem;background:var(--bg)}
+.lbl{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--blue);margin-bottom:.25rem}
+/* Práctica */
+.sub{display:flex;gap:.4rem;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:.6rem}
+.sub button{border:0;background:var(--surface);padding:.5rem .9rem;border-radius:8px;font-weight:600;color:var(--navy)}
+.sub button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.scene{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;max-width:760px}
+.bubble{background:var(--surface);border-radius:14px 14px 14px 2px;padding:.8rem 1rem;position:relative}
+.bubble b{color:var(--blue);font-size:.8rem;display:block}
+.choices{display:flex;flex-direction:column;gap:.5rem}
+.choices button{text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:8px;padding:.7rem .9rem}
+.choices button:hover:not(:disabled){border-color:var(--blue)}
+.choices button.ok{border-color:var(--ok);background:var(--ok-soft)} .choices button.no{border-color:var(--bad);background:var(--bad-soft)}
+.choices button:disabled{cursor:default;color:var(--ink)}
+.fb{border-radius:8px;padding:.75rem .9rem;font-size:.95rem} .fb.ok{background:var(--ok-soft)} .fb.no{background:var(--bad-soft)}
+.prog{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}.prog i{display:block;height:100%;background:var(--orange);border-radius:99px;transition:width .3s}
+@media (prefers-reduced-motion:reduce){.prog i{transition:none}}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .9rem}
+@media (max-width:600px){.form{grid-template-columns:minmax(0,1fr)}}
+label.f{display:flex;flex-direction:column;gap:.2rem;font-size:.86rem;font-weight:600;color:var(--navy)}
+input[type=number],select{font:inherit;padding:.45rem .55rem;border:1.5px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+input[type=range]{width:100%;accent-color:var(--orange)}
+input[type=checkbox]{accent-color:var(--blue);width:1.05rem;height:1.05rem}
+.check{display:flex;gap:.5rem;align-items:center;font-size:.94rem}
+.result{border-radius:var(--r);padding:1rem;background:var(--surface)}
+.result.ok{background:var(--ok-soft)} .result.warn{background:var(--orange-soft)} .result.no{background:var(--bad-soft)}
+.big{font-family:var(--fd);font-weight:700;font-size:2rem;color:var(--navy);line-height:1.1}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:.45rem .55rem;text-align:left;vertical-align:top}
+th{background:var(--navy);color:#fff;font-weight:600}
+.scroll{overflow-x:auto}
+td.in{background:#FFF8CC;color:#0B4FA8;font-weight:600} td.auto{background:#ECEEF2;color:var(--muted)} td.key{background:var(--surface-2);font-weight:700;color:var(--navy)}
+/* Método */
+.step{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem;align-items:start}
+.stepn{width:2.4rem;height:2.4rem;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:var(--fd);font-weight:700}
+.meter{position:relative;height:30px;border-radius:6px;background:linear-gradient(90deg,var(--surface-2),var(--sky),var(--blue),var(--navy))}
+.meter i{position:absolute;top:-6px;bottom:-6px;width:4px;background:var(--orange);border-radius:2px;transform:translateX(-2px)}
+.scale{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:.35rem}
+.bar{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(36px,1fr) 2.9rem;gap:.5rem;align-items:center;font-size:.86rem}
+.bar .t{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden}.bar .t i{display:block;height:100%;background:var(--blue)}
+
+.cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;font-size:.78rem;text-align:center;font-weight:700}
+.cats div{padding:.45rem .2rem;border-radius:4px;color:#fff}
+.cats .on{outline:3px solid var(--orange);outline-offset:1px}
+/* Plantilla */
+.xl{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.xl-body{padding:1.1rem;min-height:230px}
+.xl-tabs{display:flex;overflow-x:auto;background:var(--surface-2);border-top:1px solid var(--line);scrollbar-width:thin}
+.xl-tabs button{border:0;border-right:1px solid var(--line);background:none;padding:.45rem .8rem;font-size:.84rem;font-weight:600;white-space:nowrap;color:var(--muted)}
+.xl-tabs button[aria-pressed="true"]{background:var(--bg);color:var(--navy);box-shadow:inset 0 3px 0 var(--orange)}
+.flow{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;font-size:.86rem;font-weight:600}
+.flow span{padding:.4rem .7rem;border-radius:6px;background:var(--surface-2);color:var(--navy)}
+.flow span.w{background:#FFF8CC;color:#0B4FA8} .flow span.r{background:var(--navy);color:#fff} .flow i{color:var(--sky);font-style:normal}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1rem;font-size:.85rem}
+.sw{display:inline-block;width:1rem;height:1rem;border-radius:3px;border:1px solid var(--line);vertical-align:-2px;margin-right:.3rem}
+footer{border-top:1px solid var(--line);padding-block:1.2rem;color:var(--muted);font-size:.84rem}
+details.gl summary{cursor:pointer;font-weight:700;color:var(--navy)}
+
+/* Simulador */
+#p-sim{scroll-margin-top:5.5rem}
+.fc{border:1px solid var(--line);border-radius:var(--r);padding:.9rem 1rem;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:.8rem 1.2rem;background:var(--bg)}
+.fc.sub{border-style:dashed;background:var(--surface);margin-left:1.2rem}
+@media (max-width:720px){.fc{grid-template-columns:minmax(0,1fr)}.fc.sub{margin-left:.6rem}}
+.ctl{display:flex;flex-direction:column;gap:.4rem;border-left:3px solid var(--orange);padding-left:.8rem}
+.ctl label{display:flex;gap:.55rem;align-items:center;font-size:.93rem;min-height:1.7rem}
+.ctl input[type=radio]{accent-color:var(--blue);width:1.05rem;height:1.05rem;flex:none}
+.ctl input[type=checkbox]{flex:none}
+.ctl[data-off]{border-left-color:var(--line)} .ctl[data-off] label{opacity:.45}
+.ctl[data-off]::before{content:'Primero pregunte a Ana';font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.btn.ask{align-self:flex-start;padding:.4rem .8rem;font-size:.9rem}
+.fbk:empty{display:none}
+</style>
+
+<header class="top"><div class="wrap top-in">
+  <div class="brand"><img src="data:image/png;base64,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" alt="INCAE"><b>Entrenador ICIF</b></div>
+  <nav class="tabs" id="nav" aria-label="Secciones"></nav>
+</div></header>
+
+<main class="wrap">
+<!-- ===== INICIO ===== -->
+<section class="view" id="v-inicio">
+  <div class="hero">
+    <div class="stack">
+      <span class="eyebrow">Por qué medimos · FODEMIPYME</span>
+      <p class="phrase">El Fondo <em>entiende</em>, <em>potencia</em> y <em>habilita</em> a cada negocio para que llegue a ser una <mark>empresa sostenible</mark>.</p>
+      <p class="lead">Esa frase es la teoría de cambio de FODEMIPYME: lo que el Fondo cree que pasa cuando apoya a un negocio. La medición existe para comprobar, con datos, si de verdad pasa. Y esos datos salen de una sola fuente: la entrevista que usted va a hacer.</p>
+      <div class="row"><button class="btn" data-go="instrumento">Conocer el instrumento</button><button class="btn ghost" data-go="practica">Ir a practicar</button></div>
+    </div>
+    <div class="facts">
+      <div class="fact"><b class="num">31</b><span>preguntas en el tronco común</span></div>
+      <div class="fact"><b class="num">≈ 13</b><span>minutos por entrevista (estimado)</span></div>
+      <div class="fact"><b class="num">12</b><span>indicadores en tres dimensiones</span></div>
+      <div class="fact"><b class="num">2</b><span>momentos: hoy y dentro de 12 meses</span></div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div><h2>La cadena del Fondo, etapa por etapa</h2><p class="muted">Toque cada etapa para ver qué pasa ahí, cómo se mide y cuál es su papel como persona encuestadora.</p></div>
+    <div class="toc">
+      <div class="side">
+        <div class="card"><div class="lbl">Por qué · mandato</div><b>Ley 8262, reformada por la Ley 10960</b><p class="small">«Fomentar y fortalecer el desarrollo» de emprendimientos, MIPYMES, productores agropecuarios y organizaciones de la economía social solidaria.</p></div>
+        <div class="card"><div class="lbl">Con qué · instrumentos</div><ul class="small"><li>Crédito directo</li><li>SDE: capacitación, asistencia técnica y acompañamiento</li><li class="muted"><i>Avales y garantías: fuera de la medición en esta fase</i></li></ul></div>
+      </div>
+      <div>
+        <div class="lbl">Cómo · el recorrido de cada negocio</div>
+        <div class="chain" id="chain"></div>
+        <div class="measure"><div>Línea base (T0)</div><div>Registro del apoyo</div><div class="icif">Aquí mira el ICIF · 12 indicadores</div></div>
+        <div class="stagepanel" id="stagepanel" aria-live="polite"></div>
+      </div>
+      <div class="side">
+        <div class="card"><div class="lbl">Para qué · resultados</div>
+          <div class="stack-s small"><span class="pill b">Rentabilidad</span><span class="pill" style="background:var(--blue-2);color:#fff">Impacto social</span><span class="pill" style="background:var(--sky);color:var(--navy)">Sostenibilidad ambiental</span></div></div>
+        <div class="dark" style="padding:.8rem"><b class="small">Desarrollo sostenible del territorio y del país</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g3">
+    <div class="card stack-s"><h3>Hoy el Fondo sabe cuánto presta</h3><p>Puede decir cuántos créditos dio y por cuánto. Eso es la etapa «Potenciar». No puede decir todavía qué cambió en los negocios.</p></div>
+    <div class="card stack-s"><h3>La medición mira lo que cambia</h3><p>El ICIF compara al mismo negocio antes del apoyo y 12 meses después: ventas, empleo, formalización, seguro social, prácticas ambientales.</p></div>
+    <div class="dark stack-s"><span class="eyebrow">Su papel</span><h3>Sin una buena entrevista, no hay índice</h3><p>Cada respuesta que usted registra alimenta un indicador. Si el dato es dudoso, el caso no entra en los resultados que se publican.</p></div>
+  </div>
+
+  <div class="band stack">
+    <h2>Dos ideas para no perderse</h2>
+    <div class="grid g2">
+      <div class="stack-s"><h3>Se compara cada negocio consigo mismo</h3><p>No se compara a Ana con otra empresaria. Se compara a Ana hoy con Ana dentro de un año. Por eso la entrevista de hoy, la <b>línea base</b>, es tan importante: es la foto del «antes».</p></div>
+      <div class="stack-s"><h3>Se habla de contribución, no de causa</h3><p>Si las ventas de Ana suben, el Fondo contribuyó, pero no puede decir que fue la única causa. Usted no necesita explicar esto en la entrevista; solo registrar bien lo que la persona responde.</p></div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <h2>Ruta sugerida de aprendizaje</h2>
+    <div class="grid g3" id="route"></div>
+  </div>
+</section>
+
+<!-- ===== INSTRUMENTO ===== -->
+<section class="view" id="v-instrumento" hidden>
+  <div class="stack-s"><span class="eyebrow">El instrumento</span><h1>El cuestionario, pregunta por pregunta</h1>
+  <p class="lead">Elija un módulo. En cada pregunta verá qué decir, las opciones de respuesta, <b>por qué se pregunta</b> y en qué fijarse. Las preguntas siguen la redacción de la encuesta de microempresas del INEC (ENAMEH), para poder comparar con el país.</p></div>
+  <div class="row"><span class="pill n">Se pregunta</span><span class="pill b">Se confirma</span><span class="pill o">Solo si aplica</span><span class="pill">No se pregunta</span></div>
+  <div class="chips" id="modchips" role="group" aria-label="Módulos"></div>
+  <div class="band" id="modintro"></div>
+  <div class="stack-s" id="qlist"></div>
+</section>
+
+<!-- ===== PRÁCTICA ===== -->
+<section class="view" id="v-practica" hidden>
+  <div class="stack-s"><span class="eyebrow">Practicar</span><h1>Practique antes de la primera entrevista</h1>
+  <p class="lead">En el simulador usted hace la entrevista de línea base a Ana: le pregunta, escucha su respuesta y llena el formulario, módulo por módulo. Los otros dos ejercicios sirven para probar el control de balance y el registro del empleo con sus propias cifras.</p></div>
+  <div class="sub" id="pracsub" role="group" aria-label="Ejercicios"></div>
+  <div id="p-sim" class="stack"></div>
+  <div id="p-bal" class="stack" hidden>
+    <div class="stack-s"><h2>Control de balance</h2><p class="muted">El formulario compara la ganancia que sale de las cifras con la que declara la persona. Cambie los números y vea qué pasa. El ejemplo empieza con un gasto olvidado: intente conciliarlo.</p></div>
+    <div class="grid g2">
+      <div class="card stack"><div class="form" id="balform"></div>
+        <p class="small muted">Pista: la persona recuerda después que gasta ₡45 000 al mes en gasolina.</p></div>
+      <div class="stack"><div class="result" id="balout" aria-live="polite"></div>
+        <div class="tip"><b>Nunca se cambia una cifra solo para que cuadre.</b> Si hay una explicación (una compra grande de inventario, la venta de un equipo), se anota en las observaciones.</div></div>
+    </div>
+  </div>
+  <div id="p-emp" class="stack" hidden>
+    <div class="stack-s"><h2>Empleo y clientes: los saltos del formulario</h2><p class="muted">El formulario evita preguntas que no hacen falta. Pruebe distintas respuestas y vea qué se abre y qué se salta.</p></div>
+    <div class="grid g2">
+      <div class="card stack"><h3>¿Cuántas personas trabajan en el negocio?</h3><div class="form" id="empform"></div><div class="result" id="empout" aria-live="polite"></div></div>
+      <div class="card stack"><h3>¿A qué tipos de clientes les vende?</h3><div class="stack-s" id="cliform"></div><div class="result" id="cliout" aria-live="polite"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MÉTODO ===== -->
+<section class="view" id="v-metodo" hidden>
+  <div class="stack-s"><span class="eyebrow">Del dato al índice</span><h1>Cómo una respuesta se convierte en puntaje</h1>
+  <p class="lead">Usted no calcula el índice: lo hace la plantilla. Pero entender los cinco pasos le ayuda a saber por qué cada dato importa. Mueva los controles y vea el resultado.</p></div>
+
+  <div class="step"><div class="stepn">1</div><div class="stack">
+    <div><h2>Cada indicador se lleva a una escala de 0 a 100</h2><p>Hay dos formas de puntuar. Los indicadores de <b>cambio</b> (ventas, margen, aporte al hogar, uso de recursos) comparan hoy con dentro de un año: mantenerse igual vale 50. Los de <b>nivel</b> (prácticas, residuos) miran cuánto se cumple.</p></div>
+    <div class="grid g2">
+      <div class="card stack"><h3>Cambio: ventas reales</h3>
+        <label class="f">Cambio de las ventas en un año, ya descontada la inflación<input type="range" id="sl-e1" min="-30" max="30" step="0.1" value="14.4"></label>
+        <div class="row"><div class="big num" id="e1-pts"></div><div id="e1-txt" class="small"></div></div>
+        <div><div class="meter"><i id="e1-mark"></i></div><div class="scale"><span>0 · cae 15 % o más</span><span>50 · se mantuvo</span><span>100 · crece 15 % o más</span></div></div>
+        <p class="small muted">Regla: 50 puntos más (o menos) 50 por cada 15 % de cambio. «Reales» quiere decir que se descuenta la inflación: si todo subió 2 %, vender 2 % más no es crecer.</p></div>
+      <div class="card stack"><h3>Nivel: prácticas ambientales</h3>
+        <div class="form"><label class="f">Prácticas que aplican al negocio<input type="number" id="a1-ap" min="1" max="8" value="5"></label><label class="f">Prácticas que realiza<input type="number" id="a1-ad" min="0" max="8" value="2"></label></div>
+        <div class="row"><div class="big num" id="a1-pts"></div><div id="a1-txt" class="small"></div></div>
+        <p class="small muted">Regla: prácticas que realiza entre prácticas que le aplican, por 100. Por eso el formulario solo muestra las que aplican: no se castiga a una soda por no conservar bosque.</p></div>
+    </div>
+    <div class="tip"><b>Por qué importa para usted:</b> en los indicadores de cambio, un error de digitación en las ventas de hoy cambia el puntaje de dentro de un año. Por eso los montos se confirman en palabras.</div>
+  </div></div>
+
+  <div class="step"><div class="stepn">2</div><div class="stack">
+    <div><h2>Los indicadores se promedian en tres dimensiones</h2><p>Cada dimensión es el promedio simple de sus indicadores. Este es el caso de Ana, una comerciante de 29 años de un distrito rural, un año después de su microcrédito.</p></div>
+    <div class="grid g3" id="dims"></div>
+  </div></div>
+
+  <div class="step"><div class="stepn">3</div><div class="stack">
+    <div><h2>Las tres dimensiones se combinan en el puntaje de resultados (PR)</h2><p>Se usa una media geométrica, que premia avanzar de forma pareja. Si una dimensión queda muy atrás, el PR baja más que con un promedio común. Pruebe: suba dos dimensiones y baje una.</p></div>
+    <div class="grid g2">
+      <div class="card stack">
+        <label class="f">Económica: <span id="v-de" class="num"></span><input type="range" id="sl-de" min="0" max="100" step="0.1" value="88"></label>
+        <label class="f">Social: <span id="v-ds" class="num"></span><input type="range" id="sl-ds" min="0" max="100" step="0.1" value="78.7"></label>
+        <label class="f">Ambiental: <span id="v-da" class="num"></span><input type="range" id="sl-da" min="0" max="100" step="0.1" value="54.6"></label>
+        <button class="btn ghost" id="reset-ana">Volver al caso de Ana</button></div>
+      <div class="result stack"><div><div class="lbl">Puntaje de resultados (PR)</div><div class="big num" id="pr"></div></div>
+        <p class="small" id="pr-txt"></p></div>
+    </div>
+  </div></div>
+
+  <div class="step"><div class="stepn">4</div><div class="stack">
+    <div><h2>El factor de prioridad reconoce a quién llega el Fondo</h2><p>La ley pide dar prioridad a mujeres, jóvenes y territorios rezagados. Por cada condición que cumple el negocio se suma 5 %. El resultado es una segunda cifra, el <b>ICIF ajustado</b>, que siempre se publica al lado del PR. El PR no cambia.</p></div>
+    <div class="grid g2">
+      <div class="card stack-s" id="fpi"></div>
+      <div class="result stack"><div class="row"><div><div class="lbl">Factor</div><div class="big num" id="fpi-v"></div></div><div><div class="lbl">ICIF ajustado</div><div class="big num" id="icif"></div></div></div>
+        <p class="small" id="icif-txt"></p>
+        <div><div class="lbl">Cómo se lee el PR (propuesta para comunicar, por confirmar)</div><div class="cats" id="cats"></div><div class="scale"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div></div></div>
+    </div>
+    <div class="tip"><b>Por qué importa para usted:</b> las condiciones salen del módulo 1 (quién decide, su sexo y su año de nacimiento) y de la ubicación del expediente. Si registra mal quién decide, el factor queda mal.</div>
+  </div></div>
+
+  <div class="step"><div class="stepn">5</div><div class="stack">
+    <div><h2>La calidad del dato decide si el caso entra en los resultados</h2><p>La calidad no cambia el puntaje. Decide si ese caso se puede usar en los promedios que se publican. Depende de tres cosas, y las tres pasan por sus manos.</p></div>
+    <div class="grid g2">
+      <div class="card"><div class="form" id="qform"></div></div>
+      <div class="result" id="qout" aria-live="polite"></div>
+    </div>
+  </div></div>
+
+  <details class="gl band"><summary>Glosario breve</summary><dl class="kv" style="margin-top:.8rem" id="gloss"></dl></details>
+</section>
+
+<!-- ===== PLANTILLA ===== -->
+<section class="view" id="v-plantilla" hidden>
+  <div class="stack-s"><span class="eyebrow">La plantilla de cálculo</span><h1>Qué pasa con las respuestas después de la entrevista</h1>
+  <p class="lead">La plantilla es un archivo de Excel que recibe las entrevistas y calcula el índice sola. Tiene once hojas, pero solo en dos se escribe. Toque cada pestaña para ver para qué sirve.</p></div>
+  <div class="band stack">
+    <h3>El camino de un dato</h3>
+    <div class="flow"><span class="w">Beneficiarios</span><i>+</i><span class="w">Respuestas</span><i>→</i><span>Base</span><i>→</i><span>Cálculo</span><i>→</i><span class="r">Resultados</span><i>→</i><span class="r">Resumen</span></div>
+    <div class="legend"><span><i class="sw" style="background:#FFF8CC"></i>Celda amarilla: se escribe a mano</span><span><i class="sw" style="background:#ECEEF2"></i>Columna gris: cálculo automático, no se toca</span><span><i class="sw" style="background:var(--surface-2)"></i>Azul claro: cifra principal</span></div>
+  </div>
+  <div class="xl"><div class="xl-body" id="xlbody" aria-live="polite"></div><div class="xl-tabs" id="xltabs" role="group" aria-label="Hojas de la plantilla"></div></div>
+  <div class="grid g2">
+    <div class="stack"><h2>Siete pasos para usarla</h2><ol class="stack-s" id="xlsteps" style="margin:0;padding-left:1.2rem"></ol></div>
+    <div class="stack"><h2>Errores que cuestan caro</h2><div class="stack-s" id="xlerr"></div></div>
+  </div>
+  <div class="stack"><h2>Cómo leer el resultado de un beneficiario</h2>
+    <p class="muted">Así se ve el caso de Ana en la hoja Resultados (fila de ejemplo EJ-01 de la plantilla).</p>
+    <div class="scroll"><table class="num"><thead><tr><th>ID</th><th>Perfil</th><th>Estado de la medición</th><th>Económico</th><th>Social</th><th>Ambiental</th><th>PR</th><th>Factor</th><th>ICIF ajustado</th><th>Calidad</th></tr></thead>
+    <tbody><tr><td>EJ-01</td><td>B</td><td>Seguimiento completo</td><td class="key">88,0</td><td class="key">78,7</td><td class="key">54,6</td><td class="key">72,3</td><td>1,20</td><td class="key">86,8</td><td class="key">Media</td></tr></tbody></table></div>
+    <div class="grid g3">
+      <div class="card stack-s"><h4>PR e ICIF ajustado, juntos</h4><p class="small">El PR dice qué tan buenos fueron los resultados. El ICIF ajustado suma el reconocimiento por llegar a una mujer joven en un distrito rural rezagado.</p></div>
+      <div class="card stack-s"><h4>Calidad «Media»</h4><p class="small">La línea base fue alta (entrevista en plazo, cuaderno de ventas, balance que cuadró). El seguimiento usó montos de memoria y el balance se concilió: vale la calidad menor de las dos.</p></div>
+      <div class="card stack-s"><h4>Alertas y casos especiales</h4><p class="small">Las últimas columnas avisan si falta un dato, si el resultado es provisional o si se aplicó una regla especial, como un cierre o un negocio sin ventas al inicio.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRUEBA ===== -->
+<section class="view" id="v-prueba" hidden>
+  <div class="stack-s"><span class="eyebrow">Ponte a prueba</span><h1>Doce preguntas para comprobar lo aprendido</h1>
+  <p class="lead">Responda sin prisa. Cada respuesta trae su explicación. Puede repetir la prueba las veces que quiera.</p></div>
+  <div id="quiz" class="stack"></div>
+</section>
+</main>
+
+<footer><div class="wrap">Material de capacitación para el personal que aplica el cuestionario del Índice de Contribución al Impacto FODEMIPYME (ICIF). Basado en la metodología del ICIF y en su plantilla de cálculo, con el cuestionario simplificado. CLACDS–INCAE, noviembre de 2026. Los casos y nombres son ejemplos.</div></footer>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const h=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k==='html')e.innerHTML=a[k];else if(k==='class')e.className=a[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k]);}c.flat().forEach(x=>e.append(x&&x.nodeType?x:document.createTextNode(x??'')));return e;};
+const fmt=(n,d=1)=>Number(n).toLocaleString('es-CR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const col=n=>'₡'+Math.round(n).toLocaleString('es-CR').replace(/\./g,' ').replace(/,/g,' ');
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+let store={seen:{},sim:null,quiz:null};
+try{store=Object.assign(store,JSON.parse(localStorage.getItem('icif-entrenador')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('icif-entrenador',JSON.stringify(store))}catch(e){}};
+
+/* ---------- Navegación ---------- */
+const VIEWS=[['inicio','Por qué medimos'],['instrumento','El instrumento'],['practica','Practicar'],['metodo','Del dato al índice'],['plantilla','La plantilla'],['prueba','Ponte a prueba']];
+const nav=$('#nav');
+VIEWS.forEach(([id,name])=>nav.append(h('button',{'data-view':id,onclick:()=>go(id)},h('span',{class:'dot'}),name)));
+function go(id){ if(!VIEWS.some(v=>v[0]===id)) id='inicio';
+  VIEWS.forEach(([v])=>{$('#v-'+v).hidden=v!==id;});
+  $$('#nav button').forEach(b=>{const on=b.dataset.view===id;on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current');});
+  store.seen[id]=1;save();$$('#nav button').forEach(b=>b.classList.toggle('seen',!!store.seen[b.dataset.view]));
+  if(location.hash.slice(1)!==id){try{history.replaceState(null,'','#'+id)}catch(e){location.hash=id}}
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go);});
+
+/* ---------- Inicio: cadena ---------- */
+const STAGES=[
+ {n:'Entender',que:'El Fondo conoce el negocio antes de apoyarlo: qué necesita, qué le falta, dónde está y quién lo dirige.',mide:'Con la línea base (T0): la entrevista que usted hace antes de que empiece el apoyo.',ana:'Ana vende ₡600 000 al mes, trabaja sola 40 horas, no tiene seguro y sus clientes son de su distrito.',rol:'Aquí está casi todo su trabajo. La línea base es la foto del «antes». Si esa foto sale borrosa, no hay con qué comparar después.'},
+ {n:'Potenciar',que:'El Fondo entrega el apoyo: crédito en condiciones favorables, capacitación, asistencia técnica.',mide:'Con el registro del apoyo: programa, monto y fechas. No da puntaje, porque es lo que hace el Fondo, no lo que cambia en el negocio.',ana:'Ana recibe un microcrédito para capital de trabajo.',rol:'Usted no pregunta esto: viene precargado del expediente. Solo revise que esté completo antes de llamar.'},
+ {n:'Habilitar',que:'Con el apoyo, el negocio gana condiciones para crecer: se formaliza, se ordena, protege a quienes trabajan y cuida el ambiente.',mide:'Con cuatro indicadores: formalización y gestión, seguro de la CCSS, prácticas ambientales y manejo de residuos.',ana:'Un año después, Ana entrega factura electrónica, lleva 4 de 5 prácticas de gestión y cotiza a la CCSS como independiente.',rol:'Son los módulos 3, 6 y 7. Cuenta lo que el negocio hace hoy, no lo que piensa hacer.'},
+ {n:'Empresa sostenible',que:'El negocio llega a ser rentable, con impacto social positivo y responsable con el ambiente.',mide:'Con ocho indicadores: ventas, margen, continuidad, mercado, empleo, empleo de mujeres y jóvenes, aporte al hogar y uso de recursos.',ana:'Las ventas de Ana crecen 14,4 % en términos reales, contrata a una persona y ya vende en todo su cantón.',rol:'Son los módulos 2, 4, 5 y 6. Los montos del módulo 5 son los más delicados: pídalos con calma y confírmelos en palabras.'}];
+const chain=$('#chain');
+STAGES.forEach((s,i)=>chain.append(h('button',{class:'c'+i,'aria-pressed':i===0,onclick:()=>stage(i)},s.n)));
+function stage(i){$$('#chain button').forEach((b,k)=>b.setAttribute('aria-pressed',k===i));const s=STAGES[i];
+  $('#stagepanel').replaceChildren(h('h3',{},s.n),h('dl',{class:'kv',style:'margin-top:.6rem'},
+   h('dt',{},'Qué pasa'),h('dd',{},s.que),h('dt',{},'Cómo se mide'),h('dd',{},s.mide),h('dt',{},'El caso de Ana'),h('dd',{},s.ana),h('dt',{style:'color:var(--orange-ink)'},'Su papel'),h('dd',{},s.rol)));}
+stage(0);
+[['instrumento','1 · Conozca el cuestionario','Módulo por módulo: qué decir y por qué se pregunta.'],['practica','2 · Practique','Entreviste a Ana en el simulador y llene su formulario.'],['metodo','3 · Entienda el cálculo','Cinco pasos, de la respuesta al índice.'],['plantilla','4 · Conozca la plantilla','Dónde caen los datos y qué no tocar.'],['prueba','5 · Póngase a prueba','Doce preguntas con explicación.']]
+ .forEach(r=>$('#route').append(h('button',{class:'card stack-s','data-go':r[0],style:'text-align:left'},h('h3',{},r[1]),h('span',{class:'muted small'},r[2]))));
+
+/* ---------- Instrumento ---------- */
+const MODS=[
+ {id:0,n:'Precarga',min:'0',intro:'Lo que el Fondo ya sabe no se pregunta. Antes de llamar, el formulario trae estos datos del expediente. Su tarea es revisar que estén completos.'},
+ {id:1,n:'Consentimiento y liderazgo',min:'1',intro:'Abre la entrevista y define quién dirige el negocio. De aquí sale el reconocimiento a negocios de mujeres y de jóvenes.'},
+ {id:2,n:'Actividad',min:'0,5',intro:'Confirma que el negocio existe, que está activo y desde cuándo. Si es un emprendimiento que aún no vende, aquí queda su meta.'},
+ {id:3,n:'Formalización y gestión',min:'2,5',intro:'Mide qué tan formal y ordenado está el negocio. La plantilla arma con estas respuestas una «escalera» de formalización y cuenta cinco prácticas de gestión.'},
+ {id:4,n:'Mercado',min:'1,5',intro:'Mira a quién le vende el negocio, qué tan lejos llega y si usa internet para vender.'},
+ {id:5,n:'Ingresos y gastos',min:'3,5',intro:'El módulo más largo y el más delicado. De aquí salen cuatro indicadores. Todos los montos son el promedio por mes de los últimos 12 meses, en colones.'},
+ {id:6,n:'Empleo y protección',min:'2',intro:'Cuenta quiénes trabajan en el negocio, cuántas horas trabaja la persona dueña y si el negocio paga el seguro social.'},
+ {id:7,n:'Prácticas ambientales',min:'1,5',intro:'Tres preguntas sobre el uso de energía, agua y materiales, y sobre los residuos. El formulario elige qué prácticas mostrar según el negocio.'},
+ {id:9,n:'Cierre',min:'0,5',intro:'Deja abierta la puerta para volver dentro de un año. El módulo 8 (financiamiento y otros apoyos) ya no se pregunta en la línea base: pasa al seguimiento.'}];
+const K={ask:['Se pregunta','n'],conf:['Se confirma','b'],cond:['Solo si aplica','o'],no:['No se pregunta','']};
+const Q=[
+ {m:0,n:'M0',k:'no',t:'Datos del expediente',say:'No se dice nada: revise la pantalla antes de llamar.',o:['Perfil (A, B, C o D)','Tipo de apoyo: crédito, SDE o ambos','Actividad y ubicación','Sexo y año de nacimiento de la persona titular','Inscripciones (PYME, PYMPA, emprendedor, ESS)','Teléfono'],why:'La persona ya le dio estos datos al Fondo. Volver a pedirlos alarga la entrevista y cansa. Además, la ubicación del expediente decide si el negocio está en un distrito rezagado o en zona rural.',feeds:'Factor de prioridad y agrupación de resultados',tip:'Si un dato precargado falta o está mal, pregúntelo completo y anote la diferencia. Nunca cambie el perfil por su cuenta.'},
+ {m:1,n:'1.1',k:'ask',t:'Consentimiento',say:'«Responder o no responder no afecta su crédito ni el servicio. Sus respuestas no van a su expediente, y quienes aprueban su solicitud no pueden verlas. ¿Está de acuerdo en participar?»',o:['○ Sí, autoriza','○ No autoriza'],why:'La entrevista ocurre mientras la persona tramita su crédito. Si cree que sus respuestas influyen, dirá lo que piensa que el Fondo quiere oír. Las tres garantías protegen la honestidad del dato.',feeds:'Permite registrar la entrevista',tip:'Diga las tres garantías sin correr. Si no autoriza, agradezca y termine.'},
+ {m:1,n:'1.2–1.3',k:'conf',t:'Sexo y año de nacimiento de la persona dueña',say:'«Según nuestros registros, la persona dueña es mujer y nació en 1997. ¿Es correcto?»',o:['○ Correcto','○ Corregir'],why:'La ley pide dar prioridad a negocios de mujeres y de personas jóvenes (35 años o menos). Con estos dos datos se sabe si el Fondo está llegando a ellos.',feeds:'Factor de prioridad',tip:'En una persona jurídica no hay titular precargado: pregunte el sexo y el año de nacimiento.'},
+ {m:1,n:'1.4',k:'ask',t:'Quién decide',say:'«¿Es usted quien toma principalmente las decisiones del negocio?»',o:['○ Usted','○ Otra persona dueña o socia','○ Un órgano colectivo'],why:'Para el liderazgo cuenta quién decide de verdad, no quién firma los papeles. Un negocio a nombre de un hombre puede estar dirigido por su esposa, y al revés.',feeds:'Factor de prioridad',tip:'Si decide otra persona, registre su sexo y su año de nacimiento.'},
+ {m:1,n:'1.5',k:'ask',t:'Principal fuente de ingresos',say:'«¿Es este negocio la principal fuente de ingresos de su hogar?»',o:['○ Sí','○ No'],why:'Da contexto. No es lo mismo un negocio que sostiene a la familia que uno que complementa un salario.',feeds:'Contexto (no da puntaje)',tip:'No aplica en organizaciones (perfil D).'},
+ {m:1,n:'1.6',k:'cond',t:'Composición de la organización (perfil D)',say:'«¿Quién preside la organización? ¿Cuántas personas asociadas tiene, cuántas son mujeres y cuántas tienen 35 años o menos?»',o:['Sexo y año de quien preside','Número de personas asociadas, mujeres y jóvenes'],why:'En una cooperativa o asociación, el liderazgo se mide por quien preside o por la mayoría de sus personas asociadas.',feeds:'Factor de prioridad',tip:'Se confirma con el padrón de la certificación del MTSS.'},
+ {m:2,n:'2.1',k:'ask',t:'Operación actual',say:'«La semana pasada, ¿trabajó en este negocio?» Si no: «¿tiene el negocio aunque no haya trabajado?»',o:['○ Sí','○ No','Motivo de la ausencia'],why:'Confirma que el negocio existe y está activo. En el seguimiento, la misma pregunta dirá si el negocio siguió operando, se detuvo o cerró.',feeds:'E3 · Continuidad',tip:'Lea la pregunta tal como está: es la del INEC.'},
+ {m:2,n:'2.2',k:'ask',t:'Antigüedad',say:'«¿Desde hace cuánto tiempo funciona este negocio?»',o:['Años y meses','○ Aún no inicia'],why:'Un negocio que apenas arranca se mide distinto: no se le puede pedir que aumente sus ventas si todavía no vende.',feeds:'Confirma el perfil de emprendimiento',tip:'Si la respuesta contradice el expediente, anótelo. No cambie el perfil.'},
+ {m:2,n:'2.3',k:'cond',t:'Meta de ventas (emprendimientos o negocios sin ventas)',say:'«Según su plan, ¿cuánto espera vender por mes dentro de 12 meses?»',o:['Colones por mes'],why:'Si el negocio no vendía al inicio, no se puede calcular cuánto crecieron sus ventas. Por eso se le compara con la meta de su propio plan.',feeds:'E1 · Ventas (emprendimientos)',tip:'Indispensable. Sin meta registrada hoy, dentro de un año su puntaje de ventas no podrá pasar de 75. Si hay plan de negocio, la meta viene precargada: confírmela.'},
+ {m:3,n:'3.1',k:'conf',t:'Inscripciones',say:'«Según nuestros registros, el negocio tiene condición PYME vigente. ¿Es correcto?» Luego: «¿Tiene patente municipal u otra inscripción?»',o:['□ Patente municipal','□ Otra','□ Ninguna'],why:'Estar inscrito abre puertas: crédito, compras del Estado, programas de apoyo. Cada inscripción es un escalón en la ruta de formalización.',feeds:'E4 · Formalización',tip:'Las inscripciones que el Fondo ya conoce (PYME, PYMPA, emprendedor, ESS) solo se confirman.'},
+ {m:3,n:'3.2',k:'ask',t:'Hacienda',say:'«¿El negocio está inscrito en el Ministerio de Hacienda? ¿En qué régimen?»',o:['○ Tradicional','○ Simplificado','○ No inscrito'],why:'Es el paso central de la formalización. Además confirma el tipo de negocio que registra el expediente.',feeds:'E4 · Formalización',tip:'Esta respuesta también confirma el tipo de negocio que registra el expediente. Si no coincide, anótelo.'},
+ {m:3,n:'3.3',k:'ask',t:'Contabilidad',say:'«¿El negocio lleva contabilidad con un contador o una contadora?»',o:['○ Sí','○ No'],why:'Es el escalón más alto de la formalización: un negocio con contabilidad puede mostrar sus números a un banco o a un cliente grande.',feeds:'E4 · Formalización',tip:'Cuenta un contador que lleva las cuentas, no uno que solo llenó un formulario una vez.'},
+ {m:3,n:'3.4',k:'ask',t:'Comprobantes',say:'«¿Qué comprobantes entrega por sus ventas?»',o:['□ Factura electrónica','□ Tiquete','□ Recibo','□ Ninguno'],why:'La factura electrónica permite venderle a empresas e instituciones. Es el segundo escalón de la formalización.',feeds:'E4 · Formalización',tip:'Lea todas las opciones.'},
+ {m:3,n:'3.5',k:'ask',t:'Medios de cobro',say:'«¿El negocio usa alguno de estos medios?»',o:['□ Cuenta bancaria del negocio','□ SINPE Móvil','□ Datáfono','□ Ninguno'],why:'Tener una cuenta del negocio, separada de la personal, es una práctica de buena gestión: permite saber cuánto dinero es del negocio.',feeds:'E4 · Gestión',tip:'Cuenta la cuenta bancaria del negocio, no la personal.'},
+ {m:3,n:'3.6',k:'ask',t:'Prácticas de gestión',say:'«¿Cuáles de estas prácticas realiza en su negocio?» Lea una por una.',o:['□ Separa el dinero del negocio y del hogar','□ Anota los ingresos','□ Anota los gastos','□ Calcula costos para fijar precios','□ Ninguna'],why:'Son hábitos sencillos que ayudan a que un negocio dure. Muchos se trabajan en las capacitaciones del Fondo, y aquí se ve si se aplican.',feeds:'E4 · Gestión',tip:'Cuenta lo que hace hoy, no lo que aprendió ni lo que piensa hacer.'},
+ {m:3,n:'3.7',k:'no',t:'Requisitos de la organización (perfil D)',say:'No se pregunta. El personal del Fondo revisa los documentos.',o:['Certificación ESS vigente','Situación tributaria al día','Contabilidad al día','Órganos de gobierno al día'],why:'En una organización, la formalidad se comprueba con documentos, no con una declaración.',feeds:'E4 · Formalización (perfil D)',tip:'Se registra «cumple» o «no cumple», con la fuente y la fecha.'},
+ {m:4,n:'4.1',k:'ask',t:'Alcance',say:'«¿Dónde están la mayoría de sus clientes?»',o:['○ Solo en su distrito','○ En su cantón o provincia','○ En varias provincias','○ También fuera del país'],why:'Muestra si el negocio llega más lejos con el tiempo: del barrio al cantón, a otras provincias o al exterior.',feeds:'E5 · Mercado',tip:'Importa dónde están los clientes, no dónde está el negocio.'},
+ {m:4,n:'4.3',k:'ask',t:'Tipos de cliente',say:'«¿A qué tipos de clientes les vende?» Lea todos.',o:['□ Personas y hogares','□ Otros negocios','□ Instituciones públicas','□ Intermediarios','□ Clientes en el exterior'],why:'Vender a varios tipos de cliente hace al negocio menos frágil: si uno falla, quedan los otros.',feeds:'E5 · Mercado',tip:'Esta pregunta va antes que la 4.2.'},
+ {m:4,n:'4.2',k:'cond',t:'Un cliente o varios',say:'«¿Le vende a un solo cliente o a varios?»',o:['○ Uno','○ Varios'],why:'Depender de un solo cliente es un riesgo grande. Solo se pregunta si la persona marcó un único tipo de cliente; con dos o más tipos ya se sabe que tiene varios.',feeds:'E5 · Mercado',tip:'El formulario la muestra o la salta solo.'},
+ {m:4,n:'4.4',k:'ask',t:'Uso de internet',say:'«En los últimos 12 meses, ¿usó internet o redes sociales para…?»',o:['□ Atender clientes','□ Recibir pedidos','□ Hacer publicidad','□ Ninguno'],why:'Mide si el negocio usa canales digitales para vender.',feeds:'E5 · Mercado',tip:'Cuenta el uso para el negocio, no el uso personal de redes sociales.'},
+ {m:5,n:'5.1',k:'ask',t:'Ventas',say:'«En promedio, ¿cuánto vendió por mes en los últimos 12 meses?» Luego: «¿De dónde sale esa cifra?»',o:['Colones por mes','○ Facturas o comprobantes','○ Registros propios','○ Estimación personal'],why:'Es el dato más importante. Con las ventas de hoy y las de dentro de un año se ve si el negocio creció. También sirve para calcular el margen y el uso de recursos.',feeds:'E1 Ventas · E2 Margen · A3 Recursos · calidad',tip:'No sugiera cifras. Si duda, ayúdele: «pensemos en un mes normal, en uno bueno y en uno malo». Confirme el monto en palabras y anote la fuente que de verdad consultó.'},
+ {m:5,n:'5.2',k:'cond',t:'Autoconsumo (agropecuario y alimentos)',say:'«¿Toma productos del negocio para el consumo de su hogar? ¿Cuánto valen por mes?»',o:['○ Sí','○ No','Colones por mes'],why:'Lo que la familia consume del negocio también es producción. Sin ese dato, las cuentas no cuadran.',feeds:'Control de balance',tip:'Solo aparece en actividades agropecuarias y de alimentos.'},
+ {m:5,n:'5.3',k:'ask',t:'Gastos en seis rubros',say:'«En promedio, ¿cuánto gastó por mes en…?» Lea los seis rubros uno por uno.',o:['(a) Mercadería e insumos','(b) Salarios y cargas sociales','(c) Electricidad o gas','(d) Agua','(e) Gasolina o diésel','(f) Todos los demás gastos'],why:'Con los gastos se revisa que la ganancia tenga sentido. Además, lo que gasta en luz, agua y combustible muestra si el negocio usa esos recursos con más eficiencia.',feeds:'E2 Margen · A3 Recursos · prácticas del módulo 7',tip:'Un cero es una respuesta válida: escríbalo. Si la persona no sabe, registre «no sabe»; no deje la casilla vacía.'},
+ {m:5,n:'5.4',k:'ask',t:'Ganancia',say:'«Después de pagar todos los gastos, ¿cuánto le quedó en promedio por mes?»',o:['Colones por mes (con signo menos si hubo pérdida)'],why:'La ganancia frente a las ventas da el margen: cuánto le queda al negocio de cada colón que vende.',feeds:'E2 · Margen',tip:'Aquí el formulario hace el control de balance. Si no cuadra, repase los gastos con la persona.'},
+ {m:5,n:'5.5',k:'cond',t:'Aporte al hogar (perfiles A, B y C)',say:'«De los gastos mensuales de su hogar, ¿cuánto se cubre con lo que deja este negocio?»',o:['Colones por mes'],why:'Mide si el negocio mejora la vida del hogar, que es el fin último del apoyo.',feeds:'S4 · Aporte al hogar',tip:'No aplica en organizaciones.'},
+ {m:6,n:'6.1',k:'ask',t:'Personas que trabajan',say:'«¿Cuántas personas trabajan en el negocio, incluida usted?»',o:['Número total'],why:'El empleo es uno de los resultados centrales del Fondo. Se empieza por el total para no hacer preguntas de más a quien trabaja sola.',feeds:'S1 Empleo · S2 Empleo de mujeres y jóvenes',tip:'Si responde «una», el formulario coloca a la persona dueña en su casilla y salta la matriz.'},
+ {m:6,n:'6.1 b',k:'cond',t:'Matriz de empleo (si trabajan dos o más)',say:'«De esas personas, ¿cuántas son permanentes, cuántas ocasionales con pago y cuántas ayudan sin pago?» Luego, por sexo y edad.',o:['Mujeres de 15 a 35','Mujeres de 36 o más','Hombres de 15 a 35','Hombres de 36 o más','Ayudantes sin pago: un total'],why:'Para saber si el negocio da trabajo a mujeres y a jóvenes hay que contar a cada persona una sola vez, en su casilla.',feeds:'S1 · S2',tip:'La persona dueña también va en su casilla; la plantilla la descuenta para no contarla dos veces. Quien ayuda sin pago se anota, pero no cuenta como empleo.'},
+ {m:6,n:'6.2',k:'ask',t:'Horas de la persona dueña',say:'«¿Cuántas horas a la semana trabaja usted normalmente en el negocio?»',o:['Horas por semana'],why:'El trabajo de la persona dueña también es empleo. Se mide en horas: 48 horas a la semana equivalen a una jornada completa.',feeds:'S1 · Empleo',tip:'Más de 98 horas genera una marca de revisión.'},
+ {m:6,n:'6.3',k:'ask',t:'Seguro social',say:'«¿Tiene seguro social de la CCSS? ¿De qué tipo? ¿Lo paga con este negocio?»',o:['○ Asalariado','○ Independiente','○ Voluntario','○ Familiar','○ Del Estado','○ Pensionado','○ No tiene','Lo paga con este negocio: ○ Sí ○ No'],why:'Un negocio que paga el seguro protege a quien trabaja en él. Lo que cuenta es si lo paga el negocio, no si la persona está asegurada por otra vía.',feeds:'S3 · Protección de la CCSS',tip:'Estar asegurada por el cónyuge (familiar) no cuenta como cobertura del negocio.'},
+ {m:6,n:'6.4',k:'cond',t:'Seguro del personal (si hay personas asalariadas)',say:'«¿A cuántas de las personas que trabajan para usted les paga el seguro social?»',o:['Número de personas'],why:'Completa la cobertura: personas aseguradas por el negocio entre personas que trabajan en él con pago.',feeds:'S3 · Protección de la CCSS',tip:'No puede ser mayor que el número de personas con pago.'},
+ {m:6,n:'6.5',k:'cond',t:'Póliza de riesgos (si hay personas asalariadas)',say:'«¿Tiene póliza de riesgos del trabajo del INS?»',o:['○ Sí','○ No'],why:'Es un requisito para quien tiene personal, y cuenta para el tercer escalón de la formalización.',feeds:'E4 · Formalización',tip:''},
+ {m:7,n:'7.1',k:'ask',t:'Residuos peligrosos',say:'«¿Su negocio genera alguno de estos residuos: aceites usados, baterías, llantas, envases de agroquímicos, químicos o residuos médicos?»',o:['○ Sí','○ No','○ No sabe'],why:'Entregar estos residuos a un gestor autorizado es una obligación. Por eso primero se pregunta si el negocio los genera.',feeds:'A2 · Residuos',tip:'Si duda, ayúdele con ejemplos de su actividad. Si sigue sin saber, registre «no sabe»: no lo cambie a «no» para avanzar.'},
+ {m:7,n:'7.2',k:'ask',t:'Prácticas de uso eficiente',say:'«¿Cuáles de estas prácticas realiza actualmente en su negocio?» Lea cada una que muestre el formulario.',o:['□ Iluminación o equipos de bajo consumo','□ Energía renovable propia','□ Revisa recibos o anota el consumo','□ Ahorra o reutiliza agua *','□ Uso eficiente del combustible *','□ Reduce empaques *','□ Agroquímicos responsables *','□ Conserva suelo, agua o bosque *','□ Ninguna de estas'],why:'No se le pide lo mismo a una soda que a una finca. El formulario muestra solo las prácticas que tienen sentido para ese negocio, según su actividad y sus gastos.',feeds:'A1 · Prácticas eficientes',tip:'Las marcadas con * solo aparecen si aplican. Cuenta lo que hace hoy.'},
+ {m:7,n:'7.3',k:'ask',t:'Manejo de residuos',say:'«Sobre la basura y los residuos de su negocio, ¿cuáles de estas acciones realiza?»',o:['□ Procura generar menos','□ Los separa','□ Reutiliza, recicla o composta','□ Los entrega al servicio municipal o a un gestor','□ Ninguna de estas'],why:'Mide cuántas acciones básicas de manejo de residuos cumple el negocio.',feeds:'A2 · Residuos',tip:'Si en la 7.1 respondió «sí», la última opción se lee «entrega los residuos peligrosos a un gestor autorizado». No explique que esa respuesta limita el puntaje.'},
+ {m:9,n:'9.1',k:'ask',t:'Autorización de recontacto',say:'«¿Autoriza que le contactemos de nuevo en 6 y 12 meses?» Confirme el teléfono y pida un contacto alternativo.',o:['○ Sí','○ No','Teléfono y contacto alternativo'],why:'Sin permiso para volver a llamar no hay segunda medición, y sin segunda medición no hay índice para ese negocio.',feeds:'Seguimiento',tip:'Explique para qué: «dentro de un año queremos ver cómo avanzó su negocio».'},
+ {m:9,n:'9.2',k:'cond',t:'Foto del recibo (en 15 de cada 100 entrevistas)',say:'«¿Nos puede enviar una foto de su último recibo de luz o de agua?»',o:['Imagen'],why:'Sirve para comprobar, en una muestra pequeña, que los gastos declarados se parecen a los reales.',feeds:'Calidad del dato',tip:'Solo cuando el formulario lo pide.'},
+ {m:9,n:'9.3',k:'no',t:'Registro de quien entrevista',say:'No se pregunta. Usted anota el canal, quién respondió y sus observaciones.',o:['Canal: presencial, teléfono o videollamada','Quién respondió','Código de resultado','Observaciones'],why:'Con el canal, la fecha y quién respondió, el formulario calcula la modalidad de la entrevista, que es parte de la calidad.',feeds:'Calidad del dato',tip:'Anote en observaciones todo dato raro y su explicación: una compra grande, un mes sin operar, una diferencia con el expediente.'}];
+let curMod=1;
+MODS.forEach(m=>$('#modchips').append(h('button',{'aria-pressed':m.id===curMod,onclick:()=>showMod(m.id)},(m.id?m.id+' · ':'')+m.n)));
+function showMod(id){curMod=id;const m=MODS.find(x=>x.id===id);
+  $$('#modchips button').forEach((b,i)=>b.setAttribute('aria-pressed',MODS[i].id===id));
+  $('#modintro').replaceChildren(h('div',{class:'row',style:'justify-content:space-between'},h('h2',{},(m.id?'Módulo '+m.id+' · ':'')+m.n),h('span',{class:'pill o'},'≈ '+m.min+' min')),h('p',{style:'margin-top:.4rem;max-width:75ch'},m.intro));
+  const list=$('#qlist');list.replaceChildren();
+  Q.filter(q=>q.m===id).forEach((q,i)=>{
+    const d=h('details',{class:'q'},h('summary',{},h('span',{class:'qn'},q.n),h('span',{class:'qt'},q.t),h('span',{class:'pill '+K[q.k][1]},K[q.k][0])),
+     h('div',{class:'qbody'},
+      h('div',{class:'stack-s'},h('div',{class:'lbl'},'Qué decir'),h('div',{class:'say'},q.say),h('div',{class:'opts'},q.o.map(o=>h('span',{class:'opt'},o)))),
+      h('div',{class:'stack-s'},h('div',{},h('div',{class:'lbl'},'Por qué se pregunta'),h('p',{},q.why)),h('div',{},h('div',{class:'lbl'},'Alimenta'),h('span',{class:'pill'},q.feeds)),q.tip?h('div',{class:'tip'},h('b',{},'Ojo: '),q.tip):'')));
+    if(i===0)d.open=true;list.append(d);});
+}
+showMod(1);
+
+/* ---------- Motor de preguntas (simulación y prueba) ---------- */
+function deck(root,items,key,intro){let i=0,score=0;
+  function end(){const pct=Math.round(score/items.length*100);store[key]=Math.max(store[key]||0,score);save();
+    root.replaceChildren(h('div',{class:'band stack',style:'max-width:760px'},h('h2',{},'Resultado: '+score+' de '+items.length),
+      h('p',{},pct>=85?'Muy bien. Está en condiciones de aplicar la entrevista con cuidado.':pct>=60?'Va bien. Repase las situaciones en las que dudó y vuelva a intentarlo.':'Conviene repasar el instrumento y volver a practicar.'),
+      h('p',{class:'small muted'},'Mejor resultado guardado en este navegador: '+store[key]+' de '+items.length+'.'),
+      h('div',{class:'row'},h('button',{class:'btn',onclick:()=>{i=0;score=0;show()}},'Repetir'))));}
+  function show(){const it=items[i];let done=false;
+    const fb=h('div',{'aria-live':'polite'}),next=h('button',{class:'btn',hidden:'',onclick:()=>{i++;i<items.length?show():end()}},i<items.length-1?'Siguiente':'Ver resultado');
+    const ch=h('div',{class:'choices'},it.o.map((o,k)=>h('button',{onclick:e=>{if(done)return;done=true;const ok=k===it.a;if(ok)score++;
+      $$('button',ch).forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('ok');else if(j===k)b.classList.add('no');});
+      fb.replaceChildren(h('div',{class:'fb '+(ok?'ok':'no')},h('b',{},ok?'Correcto. ':'No es lo mejor. '),it.why));next.hidden=false;next.focus();}},o)));
+    root.replaceChildren(h('div',{class:'scene'},
+      h('div',{class:'stack-s'},h('div',{class:'row',style:'justify-content:space-between'},h('span',{class:'eyebrow'},(it.tag||'Pregunta')+' · '+(i+1)+' de '+items.length),h('span',{class:'small muted'},'Aciertos: '+score)),h('div',{class:'prog'},h('i',{style:'width:'+(i/items.length*100)+'%'}))),
+      i===0&&intro?h('p',{class:'muted'},intro):'',
+      it.ctx?h('p',{},it.ctx):'',
+      it.says?h('div',{class:'bubble'},h('b',{},it.who||'Ana'),it.says):'',
+      h('h3',{},it.q),ch,fb,h('div',{},next)));}
+  show();}
+
+/* ---------- Simulador: entrevistar a Ana y llenar el formulario ---------- */
+const SM=[[1,'Consentimiento y liderazgo','Abra la entrevista y confirme quién dirige el negocio.'],[2,'Actividad','Confirme que el negocio opera y desde cuándo.'],[3,'Formalización y gestión','Registre lo que el negocio hace hoy, no lo que piensa hacer.'],[4,'Mercado','Primero los tipos de cliente. El formulario decide si hace falta la pregunta 4.2.'],[5,'Ingresos y gastos','Montos promedio por mes de los últimos 12 meses. Lea los rubros uno por uno.'],[6,'Empleo y protección','Empiece por el total de personas, incluida Ana. El formulario decide si abre la matriz.'],[7,'Prácticas ambientales','El formulario ya eligió las prácticas que aplican a un comercio.'],[9,'Cierre','Deje abierta la puerta para el seguimiento y anote sus registros.']];
+const SN=['Sí','No'];
+const SF=[
+ {m:1,id:'c11',n:'1.1',q:'Diga las tres garantías y pregunte: «¿Está de acuerdo en participar?»',t:'one',o:['Sí, autoriza','No autoriza'],x:0,ana:'¿Y esto no me afecta el crédito?… Ah, bueno. Si no me afecta ni va a mi expediente, sí, con gusto.',why:'Ana autorizó después de oír las tres garantías.'},
+ {m:1,id:'c12',n:'1.2–1.3',q:'Confirme: «Según nuestros registros, la persona dueña es mujer y nació en 1997. ¿Es correcto?»',t:'one',o:['Correcto','Corregir'],x:0,ana:'Sí, correcto.',why:'El dato del expediente coincide: solo se confirma.'},
+ {m:1,id:'c14',n:'1.4',q:'«¿Es usted quien toma principalmente las decisiones del negocio?»',t:'one',o:['Usted','Otra persona dueña o socia','Un órgano colectivo'],x:0,ana:'Diay, lo hablamos mi mamá y yo… pero la que decide al final soy yo.',why:'Cuenta quién decide principalmente. Una conversación familiar no es un órgano colectivo.'},
+ {m:1,id:'c15',n:'1.5',q:'«¿Es este negocio la principal fuente de ingresos de su hogar?»',t:'one',o:SN,x:0,ana:'Sí, de esto vivimos. Mi esposo trabaja solo por temporadas.',why:'Ana dijo que el hogar vive del negocio.'},
+ {m:2,id:'c21',n:'2.1',q:'«La semana pasada, ¿trabajó en este negocio?»',t:'one',o:SN,x:0,ana:'Sí, abro todos los días.',why:'El negocio está activo.'},
+ {m:2,id:'c22a',n:'2.2',q:'«¿Desde hace cuánto tiempo funciona este negocio?»',t:'num',u:'años',x:3,ana:'Ya voy para tres años y medio con la pulpería.',why:'Tres años y medio son 3 años y 6 meses.'},
+ {m:2,id:'c22b',n:'',q:'Meses',t:'num',u:'meses',x:6,dep:'c22a',why:'Tres años y medio son 3 años y 6 meses.'},
+ {m:3,id:'c31',n:'3.1',q:'El expediente no registra condición PYME ni otras inscripciones. Confírmelo y pregunte: «¿Tiene patente municipal u otra inscripción?»',t:'many',o:['Patente municipal','Otra','Ninguna'],x:[2],ana:'No, PYME no soy. Y la patente de la muni todavía no la tengo; ya voy a empezar el trámite.',why:'Hoy no tiene ninguna inscripción. Un trámite que piensa hacer no cuenta: se registra lo que el negocio tiene hoy.'},
+ {m:3,id:'c32',n:'3.2',q:'«¿El negocio está inscrito en el Ministerio de Hacienda? ¿En qué régimen?»',t:'one',o:['Tradicional','Simplificado','No inscrito'],x:1,ana:'Sí, estoy inscrita, en el simplificado.',why:'Régimen simplificado.'},
+ {m:3,id:'c33',n:'3.3',q:'«¿El negocio lleva contabilidad con un contador o una contadora?»',t:'one',o:SN,x:1,ana:'No, yo misma llevo mis cuentas.',why:'Llevar las cuentas por sí misma no es tener contador.'},
+ {m:3,id:'c34',n:'3.4',q:'«¿Qué comprobantes entrega por sus ventas?»',t:'many',o:['Factura electrónica','Tiquete','Recibo','Ninguno'],x:[2],ana:'Doy un recibo de talonario cuando me lo piden.',why:'Un recibo de talonario no es una factura electrónica.'},
+ {m:3,id:'c35',n:'3.5',q:'«¿El negocio usa alguno de estos medios?»',t:'many',o:['Cuenta bancaria del negocio','SINPE Móvil','Datáfono','Ninguno'],x:[1],ana:'Me pagan por SINPE Móvil. La cuenta está a mi nombre, es la personal. A nombre del negocio no tengo.',why:'La cuenta personal no es una cuenta del negocio. Solo se marca SINPE Móvil.'},
+ {m:3,id:'c36',n:'3.6',q:'«¿Cuáles de estas prácticas realiza en su negocio?» Léalas una por una.',t:'many',o:['Separa el dinero del negocio y del hogar','Anota los ingresos','Anota los gastos','Calcula costos para fijar precios','Ninguna'],x:[0,1],ana:'La plata del negocio la guardo aparte, no la revuelvo con la de la casa. Y en un cuaderno apunto lo que vendo. Los gastos no los apunto, y los precios los pongo viendo a cómo venden los demás.',why:'Separa el dinero y anota los ingresos. No anota los gastos ni calcula costos: fija precios mirando a la competencia.'},
+ {m:4,id:'c41',n:'4.1',q:'«¿Dónde están la mayoría de sus clientes?»',t:'one',o:['Solo en su distrito','En su cantón o provincia','En varias provincias','También fuera del país'],x:0,ana:'Los vecinos de aquí, del barrio.',why:'Sus clientes son del distrito.'},
+ {m:4,id:'c43',n:'4.3',q:'«¿A qué tipos de clientes les vende?» Lea todos.',t:'many',o:['Personas y hogares','Otros negocios','Instituciones públicas','Intermediarios','Clientes en el exterior'],x:[0],ana:'Gente de las casas, familias.',why:'Un solo tipo de cliente: personas y hogares.'},
+ {m:4,id:'c42',n:'4.2',q:'«¿Le vende a un solo cliente o a varios?»',t:'one',o:['Uno','Varios'],x:1,show:v=>(v.c43||[]).length===1,ana:'¡A muchos! Todo el barrio me compra.',why:'Como marcó un solo tipo, el formulario abrió esta pregunta. Ana vende a varios clientes.'},
+ {m:4,id:'c44',n:'4.4',q:'«En los últimos 12 meses, ¿usó internet o redes sociales para…?»',t:'many',o:['Atender clientes','Recibir pedidos','Hacer publicidad','Ninguno'],x:[0],ana:'Les contesto por WhatsApp a los vecinos cuando preguntan si tengo algo. Pedidos por ahí no recibo, y publicidad no hago.',why:'Un solo uso: atender clientes.'},
+ {m:5,id:'ven',n:'5.1',q:'«En promedio, ¿cuánto vendió por mes en los últimos 12 meses?»',t:'num',u:'₡ por mes',x:600000,ana:'Uy… depende mucho del mes, no sabría decirle.',more:['Ayudarle a recordar: un mes normal, uno bueno y uno malo','Déjeme ver el cuaderno… En un mes normal, 600 000. En diciembre vendo más y en enero menos, pero en promedio eso: 600 000.'],why:'No se sugiere una cifra ni se registra «no sabe» a la primera: se le ayuda a recordar.'},
+ {m:5,id:'fue',n:'',q:'«¿De dónde sale esa cifra?»',t:'one',o:['Facturas o comprobantes','Registros propios','Estimación personal'],x:1,ana:'De mi cuaderno. Ahí apunto lo que vendo cada día.',why:'Un cuaderno de ventas es un registro propio. La fuente es parte de la calidad del dato.'},
+ {m:5,id:'ga',n:'5.3',q:'«En promedio, ¿cuánto gastó por mes en…?» (a) Mercadería, materias primas e insumos',t:'num',u:'₡',x:396000,ana:'En mercadería se me van como 330 000.',why:'Al repasar los gastos, Ana recordó las compras al camión repartidor: ₡66 000 más. En total, ₡396 000.'},
+ {m:5,id:'gb',n:'',q:'(b) Salarios, cargas sociales y aguinaldos',t:'num',u:'₡',x:0,ana:'No, yo no le pago a nadie.',why:'No paga salarios: se registra cero, no se deja vacío.'},
+ {m:5,id:'gc',n:'',q:'(c) Electricidad o gas',t:'num',u:'₡',x:18000,ana:'De luz pago 18 000.',why:''},
+ {m:5,id:'gd',n:'',q:'(d) Agua',t:'num',u:'₡',x:6000,ana:'De agua, 6 000.',why:''},
+ {m:5,id:'ge',n:'',q:'(e) Gasolina o diésel',t:'num',u:'₡',x:0,ana:'No tengo carro. En eso no gasto.',why:'Un cero es un dato. Una casilla vacía sería un dato faltante.'},
+ {m:5,id:'gf',n:'',q:'(f) Todos los demás gastos',t:'num',u:'₡',x:0,ana:'No, nada más. El local es parte de mi casa, no pago alquiler.',why:'No tiene otros gastos: se registra cero.'},
+ {m:5,id:'gan',n:'5.4',q:'«Después de pagar todos los gastos, ¿cuánto le quedó en promedio por mes?»',t:'num',u:'₡',x:180000,ana:'Me quedan como 180 000.',why:'La ganancia declarada no se cambia para que el balance cuadre.'},
+ {m:5,id:'hog',n:'5.5',q:'«De los gastos mensuales de su hogar, ¿cuánto se cubre con lo que deja este negocio?»',t:'num',u:'₡',x:150000,ana:'Para la casa saco unos 150 000 al mes.',why:''},
+ {m:6,id:'tot',n:'6.1',q:'«¿Cuántas personas trabajan en el negocio, incluida usted?»',t:'num',u:'personas',x:1,ana:'Solo yo. Trabajo sola.',why:'Como trabaja sola, el formulario coloca a Ana en su casilla (mujer de 15 a 35 años, permanente) y salta la matriz de empleo.'},
+ {m:6,id:'hor',n:'6.2',q:'«¿Cuántas horas a la semana trabaja usted normalmente en el negocio?»',t:'num',u:'horas',x:40,ana:'Unas 40 horas a la semana.',why:''},
+ {m:6,id:'seg',n:'6.3',q:'«¿Tiene seguro social de la CCSS? ¿De qué tipo?»',t:'one',o:['Asalariado','Independiente','Voluntario','Familiar','Del Estado','Pensionado','No tiene'],x:3,ana:'Sí tengo seguro, por mi esposo.',why:'Está asegurada por su cónyuge: seguro familiar.'},
+ {m:6,id:'pag',n:'',q:'«¿Lo paga con este negocio?»',t:'one',o:SN,x:1,dep:'seg',why:'El negocio no paga su seguro. Eso es lo que mide el indicador.'},
+ {m:7,id:'r71',n:'7.1',q:'«¿Su negocio genera residuos peligrosos?»',t:'one',o:['Sí','No','No sabe'],x:1,ana:'¿Residuos peligrosos? ¿Como qué?',more:['Leerle la lista: aceites usados, baterías, llantas, envases de químicos…','Ah, no, nada de eso. Lo mío es cartón y plástico.'],why:'Con los ejemplos, Ana pudo responder que no. Si la duda hubiera seguido, se registraba «no sabe».'},
+ {m:7,id:'r72',n:'7.2',q:'«¿Cuáles de estas prácticas realiza actualmente?» El formulario muestra las cinco que aplican a un comercio que gasta en agua.',t:'many',o:['Iluminación o equipos de bajo consumo','Energía renovable propia','Revisa recibos o anota el consumo cada mes','Ahorra o reutiliza agua','Reduce o sustituye empaques','Ninguna de estas'],x:[0],ana:'Cambié todos los bombillos a LED. Lo demás, no.',why:'Solo una práctica: iluminación de bajo consumo.'},
+ {m:7,id:'r73',n:'7.3',q:'«Sobre la basura y los residuos de su negocio, ¿cuáles de estas acciones realiza?»',t:'many',o:['Procura generar menos','Los separa','Reutiliza, recicla o composta','Los entrega al servicio municipal o a un gestor','Ninguna de estas'],x:[1],ana:'Separo el cartón y el plástico de lo demás. Otra cosa no hago; aquí no pasa el camión de la basura.',why:'Una acción de cuatro: separa los residuos.'},
+ {m:9,id:'rec',n:'9.1',q:'«¿Autoriza que le contactemos de nuevo en 6 y 12 meses?»',t:'one',o:SN,x:0,ana:'¿Y para qué me van a volver a llamar?',more:['Explicarle: «dentro de un año queremos ver cómo avanzó su negocio»','Ah, bueno. Sí, está bien. Si no contesto, pueden llamar a mi hermana.'],why:'Ana autorizó y dio un contacto alternativo. Sin esta autorización no hay seguimiento.'},
+ {m:9,id:'can',n:'9.3',q:'Registro de quien entrevista · canal de la entrevista. Usted habló con Ana por teléfono.',t:'one',o:['Presencial','Teléfono','Videollamada'],x:1,free:1,why:'La entrevista fue por teléfono.'},
+ {m:9,id:'qui',n:'',q:'Registro de quien entrevista · quién respondió',t:'one',o:['La persona que decide','Otra persona del negocio o del hogar'],x:0,free:1,why:'Respondió Ana, que es quien decide. Así la entrevista conserva la mejor calidad.'}];
+
+function simulator(root){
+  let step=-1,asked={},vals={},res={},balFirst=null,balNow=null,cards={},balBox=null;
+  const expTxt=f=>f.t==='one'?f.o[f.x]:f.t==='many'?f.x.map(k=>f.o[k]).join(' y '):(f.u&&f.u[0]==='₡'?col(f.x):f.x+' '+(f.u||''));
+  const same=(f,v)=>f.t==='many'?Array.isArray(v)&&v.length===f.x.length&&[...v].sort().join()===[...f.x].sort().join():v===f.x;
+  const vis=f=>!f.show||!!f.show(vals);
+  function balance(){const k=['ven','ga','gb','gc','gd','ge','gf','gan'];if(k.some(x=>vals[x]==null))return null;
+    const g=vals.ga+vals.gb+vals.gc+vals.gd+vals.ge+vals.gf,imp=vals.ven-g,dec=vals.gan;
+    const ok=Math.abs(dec)<=0.05*vals.ven?Math.abs(imp-dec)<=0.05*vals.ven:(imp/dec>=0.8&&imp/dec<=1.2);return{ok,imp,g,r:dec?imp/dec:0};}
+  function upd(){Object.values(cards).forEach(c=>{c.el.hidden=!vis(c.f);const on=c.f.free||asked[c.f.dep||c.f.id];$$('input',c.ctl).forEach(i=>i.disabled=!on||c.locked);c.ctl.toggleAttribute('data-off',!on);});
+    if(balBox){const b=balance();if(!b){balBox.hidden=true;return;}balBox.hidden=false;if(balFirst===null)balFirst=b.ok;balNow=b.ok;
+      const reg=b.ok?(balFirst?'Dentro del rango':'Conciliado en la entrevista'):'Por conciliar';
+      balBox.className='result '+(b.ok?'ok':'warn');
+      balBox.replaceChildren(h('div',{class:'lbl'},'Control de balance · lo calcula el formulario'),
+        h('p',{},'Con las cifras registradas, la ganancia debería rondar '+col(b.imp)+'. Ana declaró '+col(vals.gan)+'. Cociente: '+fmt(b.r,2)+' (debe quedar entre 0,80 y 1,20).'),
+        h('p',{style:'margin:.4rem 0'},h('b',{},b.ok?'Cuadra. ':'No cuadra. '),'Registro: «'+reg+'».'),
+        b.ok?'':h('div',{class:'stack-s'},h('button',{class:'btn ghost',onclick:e=>{e.target.disabled=true;e.target.after(h('div',{class:'bubble',style:'margin-top:.5rem'},h('b',{},'Ana'),'¡Ah, claro! No le conté lo que le compro al camión repartidor cada semana: son unos 66 000 más al mes. En mercadería serían 396 000.'),h('p',{class:'small muted'},'Corrija el rubro (a) con la cifra que le dio Ana. La ganancia declarada no se toca.'));}},'Repasar los gastos con Ana')));}}
+  function card(f){const ctl=h('div',{class:'ctl'});
+    if(f.t==='one')f.o.forEach((o,k)=>ctl.append(h('label',{},h('input',{type:'radio',name:'s-'+f.id,onchange:()=>{vals[f.id]=k;upd()}}),o)));
+    if(f.t==='many')f.o.forEach((o,k)=>ctl.append(h('label',{},h('input',{type:'checkbox',value:k,onchange:()=>{vals[f.id]=$$('input:checked',ctl).map(i=>+i.value);upd()}}),o)));
+    if(f.t==='num')ctl.append(h('label',{},h('input',{type:'number',min:0,style:'max-width:11rem','aria-label':f.q,onchange:e=>{vals[f.id]=e.target.value===''?null:+e.target.value;upd()}}),f.u||''));
+    const talk=h('div',{class:'stack-s'});
+    if(f.ana)talk.append(h('button',{class:'btn ghost ask',onclick:e=>{e.target.hidden=true;asked[f.id]=1;talk.append(h('div',{class:'bubble'},h('b',{},'Ana'),f.ana));
+      if(f.more)talk.append(h('button',{class:'btn ghost ask',onclick:ev=>{ev.target.hidden=true;talk.append(h('div',{class:'bubble'},h('b',{},'Ana'),f.more[1]));}},f.more[0]));upd();}},'Preguntar a Ana'));
+    const el=h('div',{class:'fc'+(f.n?'':' sub')},h('div',{class:'stack-s'},h('div',{class:'row',style:'align-items:flex-start;flex-wrap:nowrap'},f.n?h('span',{class:'qn'},f.n):'',h('span',{class:'qt'},f.q)),talk),h('div',{class:'stack-s'},ctl,h('div',{class:'fbk'})));
+    cards[f.id]={el,ctl,f,locked:false};return el;}
+  function review(btn){btn.hidden=true;const m=SM[step][0];
+    Object.values(cards).forEach(c=>{c.locked=true;if(!vis(c.f))return;const v=vals[c.f.id],ok=same(c.f,v);res[c.f.id]=ok;
+      $('.fbk',c.el).replaceChildren(h('div',{class:'fb '+(ok?'ok':'no')},h('b',{},ok?'Bien. ':(v==null||(Array.isArray(v)&&!v.length)?'Falta registrar. ':'Revise. ')),ok?'':'Lo esperado: '+expTxt(c.f)+'. ',c.f.why||''));});
+    if(m===5){const conc=balNow&&balFirst===false&&res.ga&&res.gan;res.bal=!!conc;
+      balBox&&balBox.after(h('div',{class:'fb '+(conc?'ok':'no')},h('b',{},conc?'Bien. ':'Revise. '),conc?'El balance no cuadró a la primera; usted repasó los gastos con Ana y quedó «conciliado en la entrevista».':'Lo esperado: repasar los gastos con Ana, corregir el rubro (a) a ₡396 000 y dejar la ganancia en ₡180 000. Así el balance queda «conciliado en la entrevista».'));}
+    upd();const ok=SF.filter(f=>f.m===m&&res[f.id]).length+(m===5&&res.bal?1:0),n=SF.filter(f=>f.m===m&&f.id in res).length+(m===5?1:0);
+    btn.after(h('div',{class:'row'},h('span',{class:'pill o'},ok+' de '+n+' registros correctos'),h('button',{class:'btn',onclick:()=>{step++;draw()}},step<SM.length-1?'Siguiente módulo':'Ver el resumen')));}
+  function head(){return h('div',{class:'stack-s'},h('div',{class:'row',style:'justify-content:space-between'},h('span',{class:'eyebrow'},step<0?'Antes de llamar':step>=SM.length?'Resumen':'Módulo '+SM[step][0]+' · paso '+(step+1)+' de '+SM.length),h('span',{class:'small muted'},'Caso de práctica: Ana')),h('div',{class:'prog'},h('i',{style:'width:'+(Math.max(0,step)/SM.length*100)+'%'})));}
+  function draw(){cards={};balBox=null;
+    if(step<0){root.replaceChildren(head(),h('div',{class:'grid g2'},
+      h('div',{class:'card stack-s'},h('h3',{},'Expediente de Ana (precarga)'),h('dl',{class:'kv'},...[['Perfil','B · Autoempleo o microcrédito'],['Apoyo','Crédito (microcrédito para capital de trabajo)'],['Actividad','Comercio al por menor (pulpería)'],['Ubicación','Distrito rural, del quintil I del IDS'],['Titular','Mujer, nacida en 1997'],['Inscripciones','No registra PYME ni otras'],['Estado','Crédito aprobado; desembolso en tres semanas']].flatMap(([a,b])=>[h('dt',{},a),h('dd',{},b)]))),
+      h('div',{class:'stack'},h('div',{class:'band stack-s'},h('h3',{},'Cómo funciona el simulador'),h('ul',{},h('li',{},'Usted entrevista. Lea la pregunta y toque «Preguntar a Ana» para oír su respuesta.'),h('li',{},'Registre en el formulario lo que Ana dijo. A veces hay que repreguntar o ayudarle a recordar.'),h('li',{},'El formulario se comporta como el real: abre y salta preguntas, y revisa el balance.'),h('li',{},'Al terminar cada módulo, revise sus registros y vea la explicación.'))),
+        h('div',{class:'tip'},h('b',{},'Antes de llamar: '),'la entrevista cae dentro del plazo (entre la aprobación y el desembolso) y ayer se envió el aviso para que Ana tenga a mano su cuaderno y sus recibos.'),
+        h('div',{},h('button',{class:'btn',onclick:()=>{step=0;draw()}},'Empezar la entrevista')))));return;}
+    if(step>=SM.length){const ids=Object.keys(res),ok=ids.filter(k=>res[k]).length;store.ana=Math.max(store.ana||0,ok);save();
+      const fp=vals.fue===0?2:vals.fue===1?1:0,bp=balNow?(balFirst?2:1):null,pts=bp===null?null:2+fp+bp,q=pts===null?'Baja':pts>=5?'Alta':pts>=3?'Media':'Baja';
+      const miss=SF.filter(f=>res[f.id]===false);
+      root.replaceChildren(head(),h('div',{class:'grid g2'},
+       h('div',{class:'band stack-s'},h('h2',{},ok+' de '+ids.length+' registros correctos'),h('p',{},ok===ids.length?'Entrevista impecable. Así debe quedar una línea base.':ok/ids.length>=0.85?'Muy buen trabajo. Repase los registros que fallaron.':'Conviene repetir la entrevista con calma y releer el módulo en «El instrumento».'),
+         miss.length?h('div',{},h('div',{class:'lbl'},'Para repasar'),h('ul',{class:'small'},miss.map(f=>h('li',{},(f.n?f.n+' · ':'')+f.q.replace(/«|»/g,'').slice(0,70)+': '+expTxt(f))),res.bal===false?h('li',{},'5.4 · Control de balance: conciliado en la entrevista'):'')):'',
+         h('div',{class:'row'},h('button',{class:'btn',onclick:()=>{step=-1;asked={};vals={};res={};balFirst=null;balNow=null;draw();root.scrollIntoView({block:'start'})}},'Repetir la entrevista'))),
+       h('div',{class:'stack'},h('div',{class:'result '+(q==='Alta'?'ok':q==='Media'?'':'no')},h('div',{class:'lbl'},'Calidad del dato de esta entrevista'),h('div',{class:'big'},q),
+          h('p',{class:'small',style:'margin-top:.4rem'},'Entrevista con encuestador y en plazo: 2 puntos. Fuente de los montos: '+fp+'. Control de balance: '+(bp===null?'sin conciliar':bp)+'. '+(bp===1?'El gasto olvidado costó un punto: por eso conviene el aviso previo y leer los rubros con calma. ':'')+(bp===null?'Un balance sin conciliar deja el dato en calidad baja.':''))),
+         h('div',{class:'card stack-s'},h('h3',{},'La línea base de Ana'),h('p',{class:'small'},'Vende ₡600 000 al mes y le quedan ₡180 000. Trabaja sola, 40 horas a la semana. Está en el régimen simplificado, separa el dinero y anota sus ingresos (2 de 5 prácticas de gestión), no tiene cuenta del negocio y su seguro no lo paga el negocio. Sus clientes son del distrito y los atiende por internet. Tiene una práctica ambiental de cinco y una acción de residuos de cuatro.'),h('p',{class:'small muted'},'Dentro de 12 meses, el seguimiento mostrará qué cambió frente a esta foto.')))));return;}
+    const [m,n,intro]=SM[step];const list=h('div',{class:'stack-s'});
+    SF.filter(f=>f.m===m).forEach(f=>{list.append(card(f));if(f.id==='gan'){balBox=h('div',{class:'result',hidden:''});list.append(balBox);}});
+    root.replaceChildren(head(),h('div',{},h('h2',{},'Módulo '+m+' · '+n),h('p',{class:'muted'},intro)),list,h('div',{},h('button',{class:'btn',onclick:e=>review(e.target)},'Revisar mis registros')));
+    upd();root.scrollIntoView({block:'start'});}
+  draw();
+}
+
+const QUIZ=[
+ {q:'En un indicador de cambio, como las ventas, ¿qué significa un puntaje de 50?',o:['Que el negocio reprobó','Que el negocio se mantuvo igual','Que las ventas bajaron a la mitad'],a:1,why:'En los indicadores de cambio, 50 es el punto medio: ni avanzó ni retrocedió. No es una nota de examen.'},
+ {q:'¿En qué etapas de la cadena del Fondo mira el ICIF?',o:['En «Potenciar»: cuánto crédito se dio','En «Habilitar» y «Empresa sostenible»: lo que cambia en el negocio','Solo en «Entender»'],a:1,why:'El monto prestado es el esfuerzo del Fondo. El índice mira lo que viene después: las condiciones que se habilitan y los resultados del negocio.'},
+ {q:'La persona dice que no gasta nada en combustible. ¿Qué se registra?',o:['Cero','Casilla vacía','«No sabe»'],a:0,why:'Un cero declarado es un dato y entra en el cálculo. Una casilla vacía es un dato faltante.'},
+ {q:'¿Quién aplica la entrevista de seguimiento, a los 12 meses?',o:['La misma persona que dio el crédito, porque ya conoce al cliente','El equipo central, por teléfono','El beneficiario la llena solo, por un enlace'],a:1,why:'Nunca la aplica quien otorgó el crédito o dio el servicio, para que la persona responda con libertad. Y una entrevista que se llena sola tiene la calidad más baja.'},
+ {q:'¿Qué combinación da calidad alta?',o:['Entrevista en el plazo previsto, montos de registros o facturas y balance que cuadra','Entrevista por enlace, con facturas','Entrevista en plazo, montos de memoria y balance sin conciliar'],a:0,why:'La calidad alta necesita las tres cosas: entrevista asistida en su momento, montos con respaldo y un balance dentro del rango.'},
+ {q:'Dos negocios logran los mismos resultados. Uno lo dirige una mujer joven en un distrito rural rezagado. ¿Qué pasa con sus cifras?',o:['El de la mujer joven tiene un PR más alto','Tienen el mismo PR, y el de la mujer joven tiene un ICIF ajustado más alto','Tienen las mismas dos cifras'],a:1,why:'El PR mide resultados y no cambia por quién es la persona. El factor de prioridad produce una segunda cifra, el ICIF ajustado.'},
+ {q:'Un emprendimiento todavía no vende. ¿Qué dato no puede faltar en la línea base?',o:['La meta de ventas de su plan','El número de clientes','La foto del recibo'],a:0,why:'Sin ventas iniciales no se puede calcular un crecimiento. Se compara con la meta del plan, y sin meta el puntaje de ventas no pasa de 75.'},
+ {q:'En la matriz de empleo, ¿dónde va la persona dueña?',o:['No va: solo se cuentan los empleados','En su casilla, una sola vez','En su casilla y también en el total de asalariados'],a:1,why:'Va en su casilla según su sexo y su edad. La plantilla la descuenta, porque su trabajo entra por las horas que declara.'},
+ {q:'En la plantilla de cálculo, ¿en qué celdas se escribe?',o:['En las amarillas','En las grises','En cualquiera, mientras no tenga fórmula a la vista'],a:0,why:'Las celdas amarillas son para escribir. Las grises y las de texto negro son cálculos automáticos: no se tocan.'},
+ {q:'Va a pasar las entrevistas a la hoja Respuestas. ¿Cómo las pega?',o:['Con pegado normal','Con «Pegado especial → Valores», en el orden de columnas de la hoja Correspondencia','En cualquier orden; la plantilla las acomoda'],a:1,why:'El pegado normal puede traer formatos o fórmulas y dañar la hoja. Y el orden de las columnas debe ser el de la hoja Correspondencia.'},
+ {q:'En el seguimiento se confirma que un negocio cerró. ¿Qué pasa con su puntaje?',o:['Se excluye del promedio para no bajarlo','Vale 0 y entra en el promedio','Queda con el puntaje de la línea base'],a:1,why:'Un cierre confirmado vale 0 y cuenta. Sacarlo haría parecer que al Fondo le va mejor de lo que es.'},
+ {q:'¿Por qué el módulo de gastos va antes que el de prácticas ambientales?',o:['Por costumbre','Porque los gastos deciden qué prácticas muestra el formulario','Porque es más corto'],a:1,why:'Si el negocio gasta en combustible, se le pregunta por el uso eficiente del combustible. Si no gasta, esa práctica no aparece y no se le castiga por no tenerla.'}];
+
+/* ---------- Práctica ---------- */
+const PR=[['sim','Simulador: entreviste a Ana'],['bal','Control de balance'],['emp','Empleo y clientes']];
+PR.forEach(([id,n],i)=>$('#pracsub').append(h('button',{'aria-pressed':i===0,onclick:()=>{PR.forEach(([x])=>$('#p-'+x).hidden=x!==id);$$('#pracsub button').forEach((b,k)=>b.setAttribute('aria-pressed',PR[k][0]===id));}},n)));
+simulator($('#p-sim'));
+
+const BAL=[['ventas','Ventas por mes',600000],['auto','Autoconsumo por mes',0],['ga','(a) Mercadería e insumos',330000],['gb','(b) Salarios y cargas',0],['gc','(c) Electricidad o gas',18000],['gd','(d) Agua',6000],['ge','(e) Gasolina o diésel',0],['gf','(f) Todos los demás',66000],['gan','Ganancia declarada',120000]];
+BAL.forEach(([id,l,v])=>$('#balform').append(h('label',{class:'f'},l,h('input',{type:'number',id:'b-'+id,value:v,step:1000,oninput:bal}))));
+function bal(){const v=id=>Number($('#b-'+id).value)||0;const g=['ga','gb','gc','gd','ge','gf'].reduce((s,k)=>s+v(k),0);
+  const imp=v('ventas')+v('auto')-g,dec=v('gan'),ventas=v('ventas');let ok,detail;
+  if(Math.abs(dec)<=0.05*ventas){ok=Math.abs(imp-dec)<=0.05*ventas;detail='La ganancia declarada es casi cero, así que se compara la diferencia: debe ser de '+col(0.05*ventas)+' o menos.';}
+  else{const r=imp/dec;ok=r>=0.8&&r<=1.2;detail='Cociente: '+fmt(r,2)+'. Debe quedar entre 0,80 y 1,20.';}
+  const o=$('#balout');o.className='result '+(ok?'ok':'warn');
+  o.replaceChildren(h('div',{class:'lbl'},'Lo que calcula el formulario'),
+   h('table',{class:'num',style:'margin:.4rem 0 .8rem'},h('tbody',{},h('tr',{},h('td',{},'Ventas + autoconsumo'),h('td',{},col(v('ventas')+v('auto')))),h('tr',{},h('td',{},'Gastos (seis rubros)'),h('td',{},col(g))),h('tr',{},h('td',{},'Ganancia que sale de las cifras'),h('td',{class:'key'},col(imp))),h('tr',{},h('td',{},'Ganancia declarada'),h('td',{class:'key'},col(dec))))),
+   h('div',{class:'big'},ok?'Cuadra':'No cuadra'),h('p',{class:'small'},detail),
+   h('p',{style:'margin-top:.5rem'},ok?'Si cuadró a la primera, se registra «dentro del rango». Si cuadró después de repasar las cifras con la persona, se registra «conciliado en la entrevista».':'El formulario le pide repasar las cifras con la persona. Pregunte por gastos que suelen olvidarse: transporte, alquiler, teléfono, pagos de deudas del negocio.'));}
+bal();
+
+[['e-tot','Personas que trabajan, incluida la persona dueña',1],['e-hor','Horas a la semana de la persona dueña',40],['e-per','De las demás: permanentes con pago',0],['e-oca','De las demás: ocasionales con pago',0],['e-ayu','De las demás: ayudantes sin pago',0]]
+ .forEach(([id,l,v])=>$('#empform').append(h('label',{class:'f'},l,h('input',{type:'number',id,value:v,min:0,oninput:emp}))));
+function emp(){const n=id=>Math.max(0,Number($('#'+id).value)||0);const tot=n('e-tot'),solo=tot<=1;
+  ['e-per','e-oca','e-ayu'].forEach(id=>{$('#'+id).disabled=solo;$('#'+id).closest('label').style.opacity=solo?.45:1;});
+  const per=solo?0:n('e-per'),oca=solo?0:n('e-oca'),ayu=solo?0:n('e-ayu');const own=Math.min(1,n('e-hor')/48),ejc=own+per+0.25*oca;
+  const sum=1+per+oca+ayu,o=$('#empout');const bad=!solo&&sum!==tot;o.className='result '+(bad?'warn':'');
+  o.replaceChildren(h('div',{class:'lbl'},'Qué hace el formulario'),
+   h('p',{},solo?'Trabaja sola: el formulario coloca a la persona dueña en su casilla y salta la matriz, el seguro del personal y la póliza. Quedan las horas y el seguro social.':'Abre la matriz, solo en las categorías con personas, y pide el sexo y la edad de cada una.'+(per>0?' Como hay personas asalariadas, pregunta también por su seguro y por la póliza del INS.':'')),
+   bad?h('p',{style:'margin-top:.4rem'},h('b',{},'Verifique los números: '),'la persona dueña más las demás suman '+sum+', pero el total declarado es '+tot+'.'):'',
+   h('div',{style:'margin-top:.6rem'},h('div',{class:'lbl'},'Empleo equivalente que calculará la plantilla'),h('div',{class:'big num'},fmt(ejc,2)+' jornadas')),
+   h('p',{class:'small muted'},'Persona dueña: '+fmt(own,2)+' (sus horas entre 48, con tope de 1). Cada permanente cuenta 1; cada ocasional, 0,25; quien ayuda sin pago se anota, pero no cuenta.'));}
+emp();
+['Personas y hogares','Otros negocios','Instituciones públicas','Intermediarios','Clientes en el exterior'].forEach((t,i)=>$('#cliform').append(h('label',{class:'check'},h('input',{type:'checkbox',id:'cl-'+i,onchange:cli,...(i===0?{checked:''}:{})}),t)));
+$('#cliform').append(h('label',{class:'f',id:'cl-uno-l',style:'margin-top:.4rem'},'4.2 ¿Le vende a un solo cliente o a varios?',h('select',{id:'cl-uno',onchange:cli},h('option',{value:'v'},'Varios'),h('option',{value:'u'},'Uno'))));
+function cli(){const n=$$('#cliform input:checked').length,one=n===1;$('#cl-uno-l').hidden=!one;
+  const code=n===0?null:(one&&$('#cl-uno').value==='u'?0:n);
+  $('#cliout').replaceChildren(h('div',{class:'lbl'},'Qué hace el formulario'),
+   h('p',{},n===0?'Marque al menos un tipo de cliente.':one?'Marcó un solo tipo: el formulario muestra la pregunta 4.2, porque vender a un único cliente es un riesgo que hay que registrar.':'Marcó '+n+' tipos: el formulario registra «varios» y salta la 4.2. No hace falta preguntarla.'),
+   code===null?'':h('div',{style:'margin-top:.6rem'},h('div',{class:'lbl'},'Código de diversidad'),h('div',{class:'big num'},String(code)),h('p',{class:'small muted'},code>=2?'Nivel alto (2 o más).':'Nivel básico (0 o 1). Si dentro de un año vende a más tipos de cliente, el indicador de mercado sube.')));}
+cli();
+
+/* ---------- Método ---------- */
+function e1(){const d=Number($('#sl-e1').value),p=clamp(50+50*d/15,0,100);$('#e1-pts').textContent=fmt(p)+' pts';$('#e1-mark').style.left=p+'%';
+  $('#e1-txt').textContent=(d>0?'Las ventas crecieron ':'Las ventas cambiaron ')+(d>0?'+':'')+fmt(d)+' %. '+(p>=100?'Tope: 100 puntos.':p<=0?'Piso: 0 puntos.':Math.abs(d)<0.01?'Se mantuvo: 50 puntos.':'');}
+$('#sl-e1').addEventListener('input',e1);e1();
+function a1(){const ap=clamp(Number($('#a1-ap').value)||1,1,8),ad=clamp(Number($('#a1-ad').value)||0,0,ap);$('#a1-pts').textContent=fmt(ad/ap*100)+' pts';$('#a1-txt').textContent=ad+' de '+ap+' prácticas que le aplican.';}
+$('#a1-ap').addEventListener('input',a1);$('#a1-ad').addEventListener('input',a1);a1();
+const ANA=[['Económica',88.0,[['Ventas reales',97.9],['Margen',78.6],['Continuidad',100],['Formalización y gestión',80],['Mercado',83.3]]],['Social',78.7,[['Empleo',85],['Seguro de la CCSS',75],['Aporte al hogar',76.1]]],['Ambiental',54.6,[['Prácticas eficientes',40],['Residuos',50],['Uso de recursos',73.8]]]];
+ANA.forEach(([n,v,inds])=>$('#dims').append(h('div',{class:'card stack-s'},h('div',{class:'row',style:'justify-content:space-between'},h('h3',{},n),h('span',{class:'big num',style:'font-size:1.4rem'},fmt(v))),
+  h('div',{class:'bars'},inds.map(([t,p])=>h('div',{class:'bar'},h('span',{},t),h('span',{class:'t'},h('i',{style:'width:'+p+'%'})),h('span',{class:'num',style:'text-align:right'},fmt(p))))),
+  n==='Social'?h('p',{class:'small muted'},'El empleo de mujeres y jóvenes no aplica: el negocio tiene menos de 3 jornadas.'):'')));
+const CATS=[['Muy bajo','var(--line)','var(--navy)'],['Bajo','var(--sky)','var(--navy)'],['Medio','var(--blue-2)','#fff'],['Alto','var(--blue)','#fff'],['Muy alto','var(--navy)','#fff']];
+CATS.forEach(c=>$('#cats').append(h('div',{style:'background:'+c[1]+';color:'+c[2]},c[0])));
+const FPI=['La persona que decide es mujer','Tiene 35 años o menos','El negocio está en un distrito rezagado (IDS, quintil I o II)','El negocio está en zona rural'];
+FPI.forEach((t,i)=>$('#fpi').append(h('label',{class:'check'},h('input',{type:'checkbox',id:'fp-'+i,checked:'',onchange:calc}),t,h('span',{class:'pill o',style:'margin-left:auto'},'+5 %'))));
+function calc(){const v=id=>Number($('#sl-'+id).value);const de=v('de'),ds=v('ds'),da=v('da');
+  $('#v-de').textContent=fmt(de);$('#v-ds').textContent=fmt(ds);$('#v-da').textContent=fmt(da);
+  const pr=Math.cbrt(Math.max(1,de)*Math.max(1,ds)*Math.max(1,da)),avg=(de+ds+da)/3;$('#pr').textContent=fmt(pr);
+  $('#pr-txt').textContent='Un promedio común daría '+fmt(avg)+'. '+(avg-pr>=3?'La media geométrica queda '+fmt(avg-pr)+' puntos por debajo, porque las dimensiones están disparejas.':'Las dimensiones están parejas, así que casi no hay diferencia.');
+  const b=$$('#fpi input:checked').length,f=1+0.05*b,ic=Math.min(100,pr*f);$('#fpi-v').textContent=fmt(f,2);$('#icif').textContent=fmt(ic);
+  $('#icif-txt').textContent=b===0?'Sin condiciones de prioridad, las dos cifras son iguales.':'Se comunica así: «'+fmt(pr)+' puntos de resultados y '+fmt(ic)+' al reconocer la focalización».';
+  const k=Math.min(4,Math.floor(pr/20));$$('#cats div').forEach((d,i)=>d.classList.toggle('on',i===k));}
+['de','ds','da'].forEach(id=>$('#sl-'+id).addEventListener('input',calc));
+$('#reset-ana').addEventListener('click',()=>{$('#sl-de').value=88;$('#sl-ds').value=78.7;$('#sl-da').value=54.6;$$('#fpi input').forEach(i=>i.checked=true);calc();});calc();
+const QF=[['q-mod','Cómo y cuándo fue la entrevista',[['2','Con entrevistador, en el plazo previsto'],['1','Con entrevistador, pero fuera de plazo o respondió otra persona'],['0','La llenó la persona sola, o se reconstruyó «hace 12 meses»']]],['q-fue','De dónde salieron los montos',[['2','Facturas o comprobantes'],['1','Registros propios (cuaderno, hoja de cálculo)'],['0','Estimación de memoria']]],['q-bal','Control de balance',[['2','Cuadró a la primera'],['1','Se concilió en la entrevista'],['x','No se concilió']]],['q-mar','Marcas sin resolver a los 30 días',[['0','Ninguna'],['1','Una'],['2','Dos o más']]]];
+QF.forEach(([id,l,os],i)=>$('#qform').append(h('label',{class:'f',style:i<4?'grid-column:1/-1':''},l,h('select',{id,onchange:qual},os.map(([v,t],k)=>h('option',{value:v,...(i===1&&k===1?{selected:''}:{})},t))))));
+function qual(){const m=$('#q-mod').value,f=$('#q-fue').value,b=$('#q-bal').value,mar=Number($('#q-mar').value);let lvl;
+  if(b==='x')lvl=1;else{const pts=Number(m)+Number(f)+Number(b);lvl=(pts>=5&&m==='2')?3:pts>=3?2:1;}
+  if(mar>=2)lvl=1;else if(mar===1)lvl=Math.max(1,lvl-1);
+  const N=['','Baja','Media','Alta'],o=$('#qout');o.className='result '+(lvl===3?'ok':lvl===2?'':'no');
+  o.replaceChildren(h('div',{class:'lbl'},'Calidad del dato'),h('div',{class:'big'},N[lvl]),
+   h('p',{style:'margin:.5rem 0'},lvl===1?'El puntaje se calcula y se guarda, pero este caso no entra en los promedios que se publican.':'Este caso entra en los promedios que se publican.'),
+   h('p',{class:'small muted'},b==='x'?'Un balance sin conciliar lleva siempre a calidad baja.':'Puntos: '+(Number(m)+Number(f)+Number(b))+' de 6. Alta: 5 o 6 puntos y entrevista en plazo. Media: 3 o más. Cada marca sin resolver baja un nivel.'));}
+qual();
+[['Línea base (T0)','La entrevista antes del apoyo. Es la foto del «antes».'],['Seguimiento (T1)','La entrevista 12 meses después, con las mismas preguntas.'],['PR','Puntaje de resultados: qué tan buenos fueron los resultados del negocio, de 0 a 100.'],['ICIF ajustado','El PR multiplicado por el factor de prioridad. Se publica siempre al lado del PR.'],['Factor de prioridad','De 1,00 a 1,20. Suma 5 % por mujer, joven, distrito rezagado y zona rural.'],['Calidad (Q)','Alta, media o baja. No cambia el puntaje; decide si el caso entra en los promedios.'],['Términos reales','Con la inflación descontada.'],['Jornada equivalente','Forma de sumar empleo: 48 horas a la semana son una jornada.'],['Perfil','Tipo de negocio: A empresa en marcha, B autoempleo o microcrédito, C emprendimiento, D organización asociativa.'],['ENAMEH','Encuesta de microempresas de los hogares del INEC. El cuestionario usa sus preguntas.']]
+ .forEach(([t,d])=>$('#gloss').append(h('dt',{},t),h('dd',{},d)));
+
+/* ---------- Plantilla ---------- */
+const XL=[
+ {n:'Instrucciones',rol:'Se lee',que:'La guía rápida del archivo: los siete pasos, el código de colores y las reglas que aplica.',haga:'Léala la primera vez. Revise que la metodología, el manual y la plantilla sean de la misma edición.',ojo:'No hay nada que escribir aquí.'},
+ {n:'Correspondencia',rol:'Se lee',que:'El mapa entre el formulario y la plantilla: qué pregunta va en qué columna y qué hace la plantilla con cada dato.',haga:'Úsela para ordenar las columnas de la exportación del formulario antes de pegarlas.',ojo:'Si las columnas van en otro orden, cada dato cae en la pregunta equivocada y nadie lo nota a simple vista.'},
+ {n:'Parámetros',rol:'Solo el comité',que:'Los valores que usa el cálculo: los umbrales (15 %), el factor de prioridad (5 % por condición), los puntos de calidad y las listas de opciones.',haga:'Nada. Los valores los fija el comité metodológico.',ojo:'Cambiar un parámetro cambia todos los resultados. No se toca sin una decisión del comité.'},
+ {n:'Casos especiales',rol:'Se lee',que:'Las reglas para situaciones que no siguen la fórmula normal: un negocio que no vendía al inicio, un cierre, una pérdida de contacto.',haga:'Consúltela cuando la hoja Resultados diga que se aplicó un caso especial.',ojo:'La plantilla aplica estas reglas sola. No hay que elegirlas.'},
+ {n:'Beneficiarios',rol:'Se escribe',que:'Una fila por beneficiario, con los datos del expediente: código, perfil, tipo de apoyo, actividad, si está en un distrito rezagado y en zona rural.',haga:'Registre a cada beneficiario una sola vez. Al cerrar el seguimiento, anote el resultado: entrevista realizada, cierre confirmado o pérdida de contacto.',ojo:'El código (ID SMI) debe ser idéntico al de la hoja Respuestas. La columna gris «Controles» avisa si está duplicado o si falta la entrevista.',grid:[['ID SMI','Perfil','Instrumento','Distrito rezagado','Zona rural','Controles'],[['EJ-01','in'],['B','in'],['Crédito','in'],['Sí','in'],['Sí','in'],['(automático)','auto']]]},
+ {n:'Respuestas',rol:'Se escribe',que:'Una fila por entrevista. Cada beneficiario tendrá dos: la línea base (T0) y el seguimiento (T1). Aquí cae lo que usted registró en el formulario.',haga:'Pegue la exportación del formulario con «Pegado especial → Valores». Las dos filas se unen por el código, no por el orden.',ojo:'Montos en colones, tal como se declararon. Un cero se escribe 0; una celda vacía es un dato faltante.',grid:[['ID SMI','Momento','Fuente de los montos','Control de balance','Ventas','Ganancia'],[['EJ-01','in'],['T0','in'],['Registros propios','in'],['Dentro del rango','in'],['600 000','in'],['180 000','in']],[['EJ-01','in'],['T1','in'],['Estimación personal','in'],['Conciliado','in'],['700 000','in'],['230 000','in']]]},
+ {n:'Base',rol:'Automática',que:'Junta la línea base y el seguimiento de cada beneficiario en una sola fila y prepara los datos: arma el escalón de formalización, cuenta prácticas y clientes, y ordena el empleo sin contar dos veces a la persona dueña.',haga:'Nada.',ojo:'No se edita. Si algo se ve mal aquí, el error está en Beneficiarios o en Respuestas.'},
+ {n:'Cálculo',rol:'Automática',que:'Aplica las reglas del índice: los 12 puntajes, las tres dimensiones, el PR, el factor de prioridad, el ICIF ajustado y la calidad.',haga:'Nada. Sirve para ver cómo se llegó a un resultado.',ojo:'«NA» quiere decir que el indicador no aplica a ese negocio. «FALTA» quiere decir que falta un dato.'},
+ {n:'Resultados',rol:'Se lee',que:'El resultado de cada beneficiario: estado de la medición, las tres dimensiones, PR, factor, ICIF ajustado, calidad, casos especiales y alertas.',haga:'Revise las alertas y el estado de la medición antes de dar un resultado por bueno.',ojo:'El PR y el ICIF ajustado se leen siempre juntos. Ninguna cifra individual se usa para decidir un crédito o un cobro.',grid:[['ID SMI','PR','Factor','ICIF ajustado','Calidad','Alertas'],[['EJ-01',''],['72,3','key'],['1,20',''],['86,8','key'],['Media','key'],['—','']]]},
+ {n:'Resumen',rol:'Se lee',que:'Los promedios por grupo: todos los beneficiarios, cada perfil, cada tipo de apoyo y los grupos prioritarios. También cuenta cierres, pérdidas de contacto y casos de cada calidad.',haga:'De aquí salen las cifras que se presentan.',ojo:'Solo entran los casos de calidad alta o media, más los cierres confirmados. Un grupo con menos de 10 casos válidos no se publica.'},
+ {n:'Verificación',rol:'Se lee',que:'Una prueba del archivo: compara los resultados de las filas de ejemplo con los que deberían salir.',haga:'Mírela antes de cargar datos reales: todo debe decir «OK». Después borre las filas de ejemplo.',ojo:'Para borrar los ejemplos, seleccione las celdas amarillas y presione Suprimir. No elimine filas.'}];
+const ROLC={'Se escribe':'o','Automática':'','Se lee':'b','Solo el comité':'n'};
+XL.forEach((s,i)=>$('#xltabs').append(h('button',{'aria-pressed':i===5,onclick:()=>xl(i)},s.n)));
+function xl(i){$$('#xltabs button').forEach((b,k)=>b.setAttribute('aria-pressed',k===i));const s=XL[i];
+  $('#xlbody').replaceChildren(h('div',{class:'row',style:'justify-content:space-between;margin-bottom:.6rem'},h('h2',{},'Hoja «'+s.n+'»'),h('span',{class:'pill '+ROLC[s.rol]},s.rol)),
+   h('dl',{class:'kv'},h('dt',{},'Para qué sirve'),h('dd',{},s.que),h('dt',{},'Qué hace usted'),h('dd',{},s.haga),h('dt',{style:'color:var(--orange-ink)'},'Ojo'),h('dd',{},s.ojo)),
+   s.grid?h('div',{class:'scroll',style:'margin-top:.9rem'},h('table',{class:'num'},h('thead',{},h('tr',{},s.grid[0].map(c=>h('th',{},c)))),h('tbody',{},s.grid.slice(1).map(r=>h('tr',{},r.map(([v,c])=>h('td',{class:c},v))))))):'');}
+xl(5);
+['Revise que los parámetros sean los de la versión aprobada. No los cambie.','Registre a los beneficiarios en la hoja Beneficiarios, una fila por cada uno.','Pegue las entrevistas en la hoja Respuestas, con «Pegado especial → Valores».','Revise las columnas grises de controles y corrija lo que señalen.','Deje que las hojas Base y Cálculo trabajen solas.','Lea Resultados (cada beneficiario) y Resumen (cada grupo).','Compruebe la hoja Verificación y borre las filas de ejemplo antes de cargar datos reales.']
+ .forEach(t=>$('#xlsteps').append(h('li',{},t)));
+[['Dejar vacío en lugar de 0','La plantilla lee «falta el dato» y el indicador puede quedar sin calcular.'],['Pegar con formato o con fórmulas','Daña las validaciones de la hoja. Siempre «Pegado especial → Valores».'],['Eliminar filas','Rompe las fórmulas que unen las hojas. Borre el contenido de las celdas amarillas, no la fila.'],['Códigos que no coinciden','Si el ID de Respuestas no es idéntico al de Beneficiarios, la entrevista queda suelta.'],['Corregir montos «a mano» por la inflación','Los montos se escriben tal como se declararon. La plantilla descuenta la inflación.']]
+ .forEach(([t,d])=>$('#xlerr').append(h('div',{class:'tip'},h('b',{},t+': '),d)));
+
+/* ---------- Prueba ---------- */
+deck($('#quiz'),QUIZ,'quiz');
+go(location.hash.slice(1)||'inicio');
+</script>
+
+</body></html>
